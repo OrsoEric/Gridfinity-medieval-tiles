@@ -72,7 +72,7 @@ cornerelev = [[0, 0], [+0, 0]];
 module dummy(){}    // force customizer to stop here if it's active
 
 
-module terrain( in_seed = -1000, in_max_levels = 4, in_width = 100, in_z_delta = 20, in_erosion = 0 )
+module terrain( in_seed = -1000, in_max_levels = 4, in_width = 100, in_z_delta = 20, in_z_offset = 0, in_erosion = 0 )
 {
 	randfield = scaled2drands(in_seed, cornerelev, in_max_levels);
 
@@ -85,8 +85,8 @@ module terrain( in_seed = -1000, in_max_levels = 4, in_width = 100, in_z_delta =
 	translate([0,0,2.5]) 
     difference()
 	{
-        surfaceplot(plotfield, xlen=in_width, ylen=in_width, zoffset=zoffset, zscale=in_z_delta, box=boxed);
-		roundbevels(cornerbevel, in_width, in_width, 4*in_z_delta, -2*in_z_delta-zoffset);
+        surfaceplot(plotfield, xlen=in_width, ylen=in_width, zoffset=in_z_offset, zscale=in_z_delta, box=boxed);
+		roundbevels(cornerbevel, in_width, in_width, 4*in_z_delta, -2*in_z_delta-in_z_offset);
     }
 }
 
