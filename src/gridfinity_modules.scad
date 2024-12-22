@@ -17,7 +17,7 @@ sharp_corners = 0;
 module grid_block(
     num_x = 1,
     num_y = 1,
-    num_z = 2,
+    num_z = 1,
     magnet_diameter = 6.5,
     screw_depth = 6,
     center = false,
@@ -62,9 +62,9 @@ module grid_block(
             cylinder(r = corner_radius, h = totalht + 0.2, $fn = 32);
         }
 
-        color("blue")
-        translate([0, 0, gridfinity_zpitch * num_z])
-        pad_oversize(num_x, num_y, 1);
+        //color("red")
+        //translate([0, 0, gridfinity_zpitch * num_z])
+        //pad_oversize(num_x, num_y, 1);
 
         if (esd > 0)
         {
@@ -273,4 +273,4 @@ module gridcopy(num_x, num_y)
     children();
 }
 
-//grid_block(num_x = 1, num_y = 1, num_z = 0.5, magnet_diameter = 0, screw_depth = 0);
+grid_block(num_x = 1, num_y = 1, num_z = 0.5, magnet_diameter = 0, screw_depth = 0);
