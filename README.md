@@ -13,21 +13,21 @@ Meant to use to make D&D modular dungeons like overworld maps and dungeons.
 
 Found the skinniest base plate. There are plates that incorporate magnets and screw.
 
-![Gridfinity Base Plate](images\2024-12-19-Gridfinity-5x5.jpg)
+![Gridfinity Base Plate](/images/2024-12-19-Gridfinity-5x5.jpg)
 
 ## Gridfinity Tile - Grass
 
 My first tile! I combined a gridfinity base tile 1x1 with a fractal terrain generation algorithm to get grass. Changing the seed and the parameter allow to generate lots of unique grass tiles.
 
-![Fractal Terrain Generation](images\2024-12-22e-fractal-terrain-generation.jpg)
+![Fractal Terrain Generation](/images/2024-12-22e-fractal-terrain-generation.jpg)
 
-![Grass Tile](images\2024-12-22f-first-grass-tile-printed.jpg)
+![Grass Tile](/images/2024-12-22f-first-grass-tile-printed.jpg)
 
 SCAD code improved to generate a grid of tiles each with individually different seeds, so I can print tiles all different from each others with little work!
 
 PROBLEM: filament got stuck during the night. I need to move the filament detection closer to the head, it's a problem of my K1
 
-![Grass Tile](images\2024-12-23a-Print-25-grass-tail-partial-fail.jpg)
+![Grass Tile](/images/2024-12-23a-Print-25-grass-tail-partial-fail.jpg)
 
 
 ## Gridfinity Tile - Grass and Road
@@ -40,16 +40,16 @@ Crossroads are simply made with road intersection, and the extrusion of smaller 
 
 I placed a M2.5 pin on each section of the road for markers and such.
 
-![Straight Road](images\2024-12-23_11_07-grass-straight-road.jpg)
+![Straight Road](/images/2024-12-23_11_07-grass-straight-road.jpg)
 
 
 By increasing elevation, I can put a pause and change filament to have colored roads for free on all tiles, while still keeping each tile grass unique.
 
-![Color Change](images\2024-12-23_11_00_filament-change.jpg)
+![Color Change](/images/2024-12-23_11_00_filament-change.jpg)
 
 My K1 supports 25 tiles printed at once. I used two color changes to do a base white (cheap) than do the green for the grass, then return to the white for the road and be ready for the next batch done the same way.
 
-![Color Change](images\2024-12-23_12_25-25-Grass-Road-Tiles.png)
+![Print 25 Tiles](/images/2024-12-23_12_25-25-Grass-Road-Tiles.png)
 
 ## Attribution
 
