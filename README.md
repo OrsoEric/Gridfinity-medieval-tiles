@@ -47,6 +47,10 @@ By increasing elevation, I can put a pause and change filament to have colored r
 
 ![Color Change](images\2024-12-23_11_00_filament-change.jpg)
 
+My K1 supports 25 tiles printed at once. I used two color changes to do a base white (cheap) than do the green for the grass, then return to the white for the road and be ready for the next batch done the same way.
+
+![Color Change](images\2024-12-23_12_25-25-Grass-Road-Tiles.png)
+
 ## Attribution
 
 The fractal generation in terrain.scad has been copied and modified from: [Author](https://www.printables.com/@Anachronist) [Repository](https://www.printables.com/model/129126-procedural-weathered-fractal-terrain-in-openscad/files) inder a CC 4.0 license.
