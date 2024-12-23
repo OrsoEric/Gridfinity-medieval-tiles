@@ -18,6 +18,14 @@ My first tile! I combined a gridfinity base tile 1x1 with a fractal terrain gene
 
 ![Grass Tile](images\2024-12-22f-first-grass-tile-printed.jpg)
 
+SCAD code improved to generate a grid of tiles each with individually different seeds, so I can print tiles all different from each others with little work!
+
+PROBLEM: filament got stuck during the night. I need to move the filament detection closer to the head, it's a problem of my K1
+
+![Grass Tile](images\2024-12-23a-Print-25-grass-tail-partial-fail.jpg)
+
+
+
 
 ## Attribution
 
