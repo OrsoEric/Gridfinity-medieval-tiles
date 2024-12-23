@@ -8,26 +8,14 @@ include <terrain.scad>
 
 n_gridfinity_half_pitch = 41/2;
 
+//Define the weavy bars I use as roads
+include <road.scad>
 
-module bar_sin(in_l, in_w, in_z, in_w_amplitude, in_frequency=1)
+module pin( in_x, in_y, in_half_pitch = 41/2, in_z_top = 14, in_z_drill = 7 )
 {
-	n_step = 1/100;
-
-	linear_extrude(height=in_z)
-	polygon
-	(
-		[
-			//left side
-			//[ -in_l/2, -in_w/2 ],
-			//[ in_l/2, -in_w/2 ],
-			//make the up side weavy
-			for (n=[-0.5:n_step:0.5])
-				[ n*in_l, in_w/2+in_w_amplitude*sin(n*360*in_frequency) ],
-			for (n=[-0.5:n_step:0.5])
-				[ (-n)*in_l, -in_w/2+in_w_amplitude*sin(-n*360*in_frequency) ],
-
-		]
-	);
+	translate([in_x*in_half_pitch,in_y*in_half_pitch,in_z_top-in_z_drill])
+	linear_extrude(in_z_drill)
+	circle(d=2.5+0.3, $fs=0.1);
 }
 
 //A grass tile with a road going straight through
@@ -188,33 +176,15 @@ module tile_grass_crossroad_three_way(in_seed)
 			translate([0,0,n_z_road_top_height-n_z_road_indent])
 			bar_sin(41, n_w_road_width-2, n_z_road_indent, 1, 2);
 			
-			//Drill a hole for each of the four road
-			translate([-0.8*n_gridfinity_half_pitch,-0.05*n_gridfinity_half_pitch,n_z_road_top_height-n_z_road_thickness])
-			linear_extrude(n_z_road_thickness)
-			circle(d=2.5+0.3, $fs=0.1);
-			
-			translate([-0.05*n_gridfinity_half_pitch,-0.8*n_gridfinity_half_pitch,n_z_road_top_height-n_z_road_thickness])
-			linear_extrude(n_z_road_thickness)
-			circle(d=2.5+0.3, $fs=0.1);
-			translate([+0.05*n_gridfinity_half_pitch,+0.8*n_gridfinity_half_pitch,n_z_road_top_height-n_z_road_thickness])
-			linear_extrude(n_z_road_thickness)
-			circle(d=2.5+0.3, $fs=0.1);
-
-			//Drill a hole for each of the four fields
-			translate([-0.6*n_gridfinity_half_pitch,-0.6*n_gridfinity_half_pitch,n_z_road_top_height-n_z_road_thickness])
-			linear_extrude(n_z_road_thickness)
-			circle(d=2.5+0.3, $fs=0.1);
-translate([-0.6*n_gridfinity_half_pitch,+0.6*n_gridfinity_half_pitch,n_z_road_top_height-n_z_road_thickness])
-			linear_extrude(n_z_road_thickness)
-			circle(d=2.5+0.3, $fs=0.1);
-
-			translate([+0.6*n_gridfinity_half_pitch,-0.0*n_gridfinity_half_pitch,n_z_road_top_height-n_z_road_thickness])
-			linear_extrude(n_z_road_thickness)
-			circle(d=2.5+0.3, $fs=0.1);
-
-
+			//Drill a hole for each of the three roads
+			pin(-0.8, -0.05);
+			pin(-0.05, -0.8);
+			pin(+0.05, +0.8);
+			//Drill the grassland
+			pin(-0.6, -0.6);
+			pin(-0.6, +0.6);
+			pin(+0.6, +0.0);
 		}
-
 	}
 }
 
@@ -251,10 +221,11 @@ module grid_of_tiles_three_ways(in_rows, in_cols, spacing, in_seed_start)
 
 
 //tile_grass_road(190);
-grid_of_tiles(3,3,42,490);
+
+//grid_of_tiles(3,3,42,490);
 
 //grid_of_tiles_four_ways(2,2,42,520);
 
-//tile_grass_crossroad_three_way(0);
+tile_grass_crossroad_three_way(0);
 
 //grid_of_tiles_three_ways(3,2,42,525);
