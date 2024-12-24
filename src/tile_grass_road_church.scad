@@ -21,6 +21,8 @@ include <building.scad>
 n_gridfinity_pitch = 41;
 n_gridfinity_half_pitch = 41/2;
 
+n_terrain_roughness = 10;
+
 module pin( in_x, in_y, in_half_pitch = 41/2, in_z_top = 14, in_z_drill = 7 )
 {
 	translate([in_x*in_half_pitch,in_y*in_half_pitch,in_z_top-in_z_drill])
@@ -51,10 +53,11 @@ module tile_grass_road_church(in_seed)
 			grid_block(num_x=1, num_y=1, num_z=0.5, magnet_diameter=0, screw_depth=0);
 			//On top, create a fractal terrain
 			translate([0,0,6])
-			terrain(in_seed = in_seed, in_max_levels = 5, in_width = 41, in_z_delta = 4, in_z_offset = 1);
+			terrain(in_seed = in_seed, in_max_levels = 5, in_width = 41, in_z_delta = n_terrain_roughness, in_z_offset = 1);
+
 			//on top create a half weavy road
-			translate([-41/4,0,n_z_road_top_height-n_z_road_thickness])
-			bar_sin(41/2, n_w_road_width,n_z_road_thickness, 1, 1);
+			translate([-41/2.666,0,n_z_road_top_height-n_z_road_thickness])
+			bar_sin(41/4, n_w_road_width,n_z_road_thickness, 1, 0);
 
 			//create a basement for the buildings?
 			translate([0,0,4])
@@ -69,8 +72,8 @@ module tile_grass_road_church(in_seed)
 		union()
 		{
 			//on top create a weavy road to extrude and create the sides of the road
-			translate([-41/4,0,n_z_road_top_height-n_z_road_indent])
-			bar_sin(41/2, n_w_road_width-2, n_z_road_indent, 1, 1);
+			translate([-41/2.666,0,n_z_road_top_height-n_z_road_indent])
+			bar_sin(41/4, n_w_road_width-2, n_z_road_indent, 1, 1);
 			
 			//Drill a hole for each of the three roads
 			pin(-0.8, -0.05);

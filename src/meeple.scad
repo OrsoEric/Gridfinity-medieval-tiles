@@ -25,7 +25,7 @@ cd_hole_through = 2.5+0.3;
 //2/sqrt(3)*5
 cd_nut = 5.73+0.3;
 cl_nut = 4;
-
+cd_bolt_head = 4.5 + 0.5;
 $fn=50;
 
 module meeple_with_hole()
@@ -48,6 +48,12 @@ module meeple_with_hole()
 			rotate([0,90,90])
 			linear_extrude(cl_nut)
 			circle(r=cd_nut/2,$fn=6);
+			//M2.5 head hole to hide the head
+			translate([0,cn_height-2,cn_thickness/2])
+			rotate([0,90,90])
+			linear_extrude(cl_nut)
+			circle(d=cd_bolt_head,$fs=0.1);
+
 		}
 	}
 
@@ -97,5 +103,17 @@ module meeple()
 	}
 }
 
+module grid_of_tiles(rows, cols, in_row_spacing, in_col_spacing )
+{
+    for (x = [0:cols-1])
+    for (y = [0:rows-1])
+    {
+        translate([x * in_col_spacing, y * in_row_spacing, 0])
+            meeple_with_hole();
+    }
+}
+
 //meeple();
-meeple_with_hole();
+//meeple_with_hole();
+
+grid_of_tiles(5,5,cn_height+0,cn_width+1);

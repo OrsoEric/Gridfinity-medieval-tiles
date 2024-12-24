@@ -75,9 +75,14 @@ module dummy(){}    // force customizer to stop here if it's active
 module terrain( in_seed = -1000, in_max_levels = 4, in_width = 100, in_z_delta = 20, in_z_offset = 0, in_erosion = 0 )
 {
 	randfield = scaled2drands(in_seed, cornerelev, in_max_levels);
+	echo(randfield);
+
+	linear_plane = generate_square_2d_array(in_max_levels,in_z_delta);
+	echo(linear_plane);
 
 	// now make the landscape
-	landscape = make_landscape(cornerelev, in_max_levels, randfield);
+	//landscape = make_landscape(cornerelev, in_max_levels, randfield);
+	landscape = make_landscape(cornerelev, in_max_levels, linear_plane);
 
 	// erode the landscape (happens if erosionpasses > 0)
 	plotfield = grayerode(landscape, passes=in_erosion);
@@ -90,7 +95,26 @@ module terrain( in_seed = -1000, in_max_levels = 4, in_width = 100, in_z_delta =
     }
 }
 
-//terrain( in_max_levels =6);
+function generate_square_2d_array(level, Ztarget) =
+    let(size = pow(2, level))
+    [
+        for (y = [0 : size - 1]) [
+            for (x = [0 : size - 1])
+                interpolate(x, y, size, Ztarget)
+        ]
+    ];
+
+// Helper function to interpolate values
+function interpolate(x, y, size, Ztarget) =
+    let(
+        cx = size / 2 - 0.5, // Center x coordinate
+        cy = size / 2 - 0.5, // Center y coordinate
+        d = sqrt(pow(x - cx, 2) + pow(y - cy, 2)),
+        max_d = sqrt(pow(cx, 2) + pow(cy, 2)) // Maximum distance from center
+    )
+    Ztarget * (1 - d / max_d);
+
+terrain( in_max_levels = 3, in_z_delta = 10);
 
 /*
 
@@ -278,19 +302,40 @@ function subdivide_oddrow(lastrow, nextrow, randrownums) = let(
         : 0.5*(lastrow[ri]+nextrow[ri]) + randrownums[i*skip]
 ];
 
-// field of random numbers scaled according to coordinate
+// Function to generate a 2D field of random numbers, scaled according to coordinates.
+// Parameters:
+// - seed: The base seed for the random number generator, ensures reproducibility.
+// - cornervals: A 2x2 array defining values at the corners of the field.
+// - levels: Number of levels, determines the resolution of the field (2^levels subdivisions).
+// - leftedge: Optional, predefined values for the left edge of the field.
+// - rightedge: Optional, predefined values for the right edge of the field.
+// - topedge: Optional, predefined values for the top edge of the field.
+// - botedge: Optional, predefined values for the bottom edge of the field.
+//
+// Returns:
+// A 2D array of random numbers scaled by coordinates.
 
 function scaled2drands(seed, cornervals, levels, leftedge=undef, rightedge=undef, topedge=undef, botedge=undef) = let(
-        q = echo("Generating random number field") 1,
-        imax = pow(2, levels),
-        eleft = leftedge==undef ? randline(seed, levels, cornervals[0][0], cornervals[1][0]) : leftedge,
-        eright = rightedge==undef ? randline(seed+7, levels, cornervals[0][1], cornervals[1][1]) : rightedge
-    ) [
+    // Log the generation process
+    q = echo("Generating random number field") 1,
+
+    // Compute the number of subdivisions based on levels
+    imax = pow(2, levels),
+
+    // Generate or use predefined edge values
+    eleft = leftedge == undef ? randline(seed, levels, cornervals[0][0], cornervals[1][0]) : leftedge,
+    eright = rightedge == undef ? randline(seed + 7, levels, cornervals[0][1], cornervals[1][1]) : rightedge
+) [
+    // Generate top edge values if not provided
     topedge == undef ? randline(seed, levels, cornervals[0][0], cornervals[0][1]) : topedge,
-    for (i=[1:imax-1])
-        randline(seed+17*i, levels, eleft[i], eright[i], baselevel=numlevel(i,levels)),
+
+    // Generate random values for the field, row by row
+    for (i = [1 : imax - 1])
+        randline(seed + 17 * i, levels, eleft[i], eright[i], baselevel = numlevel(i, levels)),
+
+    // Generate bottom edge values if not provided
     botedge == undef ? randline(seed, levels, cornervals[1][0], cornervals[1][1]) : botedge
-    ];
+];
 
 // line of random numbers scaled according to index
 
