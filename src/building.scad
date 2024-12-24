@@ -108,12 +108,11 @@ module wall_with_indent( i_start, i_end, in_w=4, in_z_height=12, in_w_indent = 1
 {
 	difference()
 	{
-		wall(i_start, i_end, in_w, in_z_height=12);
+		wall(i_start, i_end, in_w, in_z_height=in_z_height);
 		translate([0,0,in_z_height-in_z_indent])
 		wall(i_start, i_end, in_w=in_w-in_w_indent, in_z_height=in_z_indent);
 	}
 }
-
 
 // OpenSCAD function to calculate bounding box of a polygon
 function calculate_bounds(polygon_points) = [
@@ -175,8 +174,10 @@ module city( i_area, iz_plaza_height = 6, in_num_houses_small = 40, in_num_house
 				//xmin + rand(xmax-xmin)
 				rand_x = bounds[0] + (bounds[2] - bounds[0]) * rands(1, 0, 1)[0];
 				rand_y = bounds[1] + (bounds[3] - bounds[1]) * rands(1, 0, 1)[0];
+				rand_r = rands(-90,90,1)[0];
 				//echo("House Position: ", rand_x,rand_y);
 				translate([rand_x,rand_y,iz_plaza_height])
+				rotate([0,0,rand_r])
 				house
 				(
 					in_length=2,
@@ -192,8 +193,10 @@ module city( i_area, iz_plaza_height = 6, in_num_houses_small = 40, in_num_house
 				//xmin + rand(xmax-xmin)
 				rand_x = bounds[0] + (bounds[2] - bounds[0]) * rands(1, 0, 1)[0];
 				rand_y = bounds[1] + (bounds[3] - bounds[1]) * rands(1, 0, 1)[0];
+				rand_r = rands(-90,90,1)[0];
 				//echo("House Position: ", rand_x,rand_y);
 				translate([rand_x,rand_y,iz_plaza_height])
+				rotate([0,0,rand_r])
 				house
 				(
 					in_length=3,
@@ -243,5 +246,5 @@ city
 
 //wall([0,0], [10,20], 8, 10);
 
-//wall_with_indent([18,-18],[11,-13], in_w=4, in_z_height=12, in_w_indent = 1.5, in_z_indent=2);
+//wall_with_indent([0,-0],[10,20], in_w=4, in_z_height=16, in_w_indent = 1.5, in_z_indent=2);
 

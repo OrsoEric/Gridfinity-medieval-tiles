@@ -28,7 +28,15 @@ function direction(angle) =
     [0, 0]; // Default for invalid inputs
 
 
-module quarter_city_block( ir_orientation = 0, in_z_wall_top_height=18, in_z_wall_height = 12, iz_plaza_top_height = 14 )
+module quarter_city_block
+(
+	ir_orientation = 0,
+	in_z_wall_height = 16,
+	in_z_wall_top_height=22,
+	iz_plaza_top_height = 18,
+	iz_short_tower_above_wall=10,
+	iz_tall_tower_above_wall=20
+)
 {
 
 	n_gridfinity = 41;
@@ -38,8 +46,8 @@ module quarter_city_block( ir_orientation = 0, in_z_wall_top_height=18, in_z_wal
 	nw_wall_width = 4;
 
 	//TOWER PARAMETERS
-	n_z_short_tower = 20;
-	n_z_tall_tower = 30;
+	n_z_short_tower = in_z_wall_height +iz_short_tower_above_wall;
+	n_z_tall_tower = in_z_wall_height +iz_tall_tower_above_wall;
 
 	//COMPUTE POINTS
 
@@ -131,7 +139,6 @@ module quarter_city_block( ir_orientation = 0, in_z_wall_top_height=18, in_z_wal
 		in_roof_ratio = 1/7
 	);
 
-
 	//CITY PLAZA
 	//Platform where the buildings are spawned
 	translate([0,0,in_z_wall_top_height-in_z_wall_height])
@@ -142,14 +149,14 @@ module quarter_city_block( ir_orientation = 0, in_z_wall_top_height=18, in_z_wal
 			end_l,
 			end_r,
 			corner_r
-		]
+		],
+		iz_plaza_height = iz_plaza_top_height-in_z_wall_top_height+in_z_wall_height
 	);
-
 
 }
 
 //A grass tile with a road going straight through
-module tile_grass_city_road_single(ib_road=true)
+module tile_grass_city_quarter(ir_second_block = 0)
 {
 	//the road reaches up to this height
 	n_z_road_top_height = 14;
@@ -159,8 +166,9 @@ module tile_grass_city_road_single(ib_road=true)
 
 	n_w_road_width = 7;
 	
-	n_z_wall_top_height = 18;
-	
+	n_z_wall_top_height = 20;
+	n_z_city_top_height = 16;
+	n_z_wall_height = 15;
 
 	difference()
 	{
@@ -178,49 +186,95 @@ module tile_grass_city_road_single(ib_road=true)
 				in_z_offset = 1,
 				in_erosion=0
 			);
-
-			//on top create a half weavy road
-			if (ib_road == true)
-			{
-				translate([-41/2.666,0,n_z_road_top_height-n_z_road_thickness])
-				bar_sin(41/4, n_w_road_width,n_z_road_thickness, 1, 0);
-			}
 			
 			quarter_city_block
 			(
 				ir_orientation=0,
-				in_z_wall_top_height=n_z_wall_top_height
+				in_z_wall_height = n_z_wall_height,
+				in_z_wall_top_height = n_z_wall_top_height,
+				iz_plaza_top_height = n_z_city_top_height
 			);
 
+			if (ir_second_block != 0)
+			{
+				quarter_city_block
+				(
+					ir_orientation=ir_second_block,
+					in_z_wall_height = n_z_wall_height,
+					in_z_wall_top_height=n_z_wall_top_height,
+					iz_plaza_top_height = n_z_city_top_height
+				);
+				
 
-
-			//create a basement for the buildings?
-			//translate([-0.5,0,8])
-			//truncated_cone(24,22,6);
-
+			}
 		}
 		union()
 		{
-			if (ib_road == true)
-			{
-				//on top create a weavy road to extrude and create the sides of the road
-				translate([-41/2.666,0,n_z_road_top_height-n_z_road_indent])
-				bar_sin(41/4, n_w_road_width-2, n_z_road_indent, 1, 0);
-				
-				//Drill a hole on the road
-				pin(-0.8, -0.0);
-			}
-			
-			//drill the church
-			pin(-0.4, -0.0, in_z_top=24, in_z_drill=9);
-
+			//Drill the city block
+			pin(-0.3, +0.8,in_z_top = n_z_wall_top_height, in_z_drill = 10);
 			//Drill the grassland
-			pin(-0.6, -0.6);
-			
+			pin(-0.0, -0.0);
+			//Drill the optional second city quarter
+			if (ir_second_block == 90)
+			{
+				pin(-0.8, -0.3,in_z_top = n_z_wall_top_height, in_z_drill = 10);
+			}
+			if (ir_second_block == 180)
+			{
+				pin(+0.3, -0.8,in_z_top = n_z_wall_top_height, in_z_drill = 10);
+			}
+			if (ir_second_block == 270)
+			{
+				pin(+0.8, -0.3,in_z_top = n_z_wall_top_height, in_z_drill = 10);
+			}
 		}
 	}
 }
 
-tile_grass_city_road_single();
+module grid_of_tiles_no_road
+(
+	in_rows = 1,
+	in_cols = 1,
+	spacing = 42,
+	in_one_city_quarter = 6,
+	in_two_city_quarters_adjacent = 3,
+	in_two_city_quarters_opposite = 3
+)
+{
+    for (x = [0:in_cols-1])
+    for (y = [0:in_rows-1])
+    {
+		n=x*in_cols+y;
+		echo("X Y N: ", x, y, n);
+		translate([x * spacing, y * spacing, 0])
+		if(n < in_one_city_quarter)
+		{	
+			tile_grass_city_quarter();
+		}
+		else if(n < in_one_city_quarter +in_two_city_quarters_adjacent)
+		{
+			tile_grass_city_quarter(90);
+		}
+		else if(n < in_one_city_quarter +in_two_city_quarters_adjacent+in_two_city_quarters_opposite)
+		{
+			tile_grass_city_quarter(180);
+		}
+			
+    }
+}
 
-//quarter_city_block(ir_orientation=0,in_z_wall_top_height=18);
+if (false)
+{
+	quarter_city_block
+	(
+		ir_orientation=0
+		//in_z_wall_height = 16,
+		//in_z_wall_top_height = 22,
+		//iz_plaza_top_height = 18
+	);
+}
+
+//tile_grass_city_quarter(180);
+
+grid_of_tiles_no_road(4,3);
+
