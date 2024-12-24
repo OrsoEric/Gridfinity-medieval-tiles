@@ -75,10 +75,25 @@ module dummy(){}    // force customizer to stop here if it's active
 module terrain( in_seed = -1000, in_max_levels = 4, in_width = 100, in_z_delta = 20, in_z_offset = 0, in_erosion = 0 )
 {
 	randfield = scaled2drands(in_seed, cornerelev, in_max_levels);
-	echo(randfield);
 
-	linear_plane = generate_square_2d_array(in_max_levels,in_z_delta);
-	echo(linear_plane);
+	// now make the landscape
+	landscape = make_landscape(cornerelev, in_max_levels, randfield);
+
+	// erode the landscape (happens if erosionpasses > 0)
+	plotfield = grayerode(landscape, passes=in_erosion);
+
+	translate([0,0,2.5]) 
+    difference()
+	{
+        surfaceplot(plotfield, xlen=in_width, ylen=in_width, zoffset=in_z_offset, zscale=in_z_delta, box=boxed);
+		roundbevels(cornerbevel, in_width, in_width, 4*in_z_delta, -2*in_z_delta-in_z_offset);
+    }
+}
+
+module hill( in_seed = -1000, in_max_levels = 4, in_width = 100, in_z_delta = 20, in_z_offset = 0, in_erosion = 0, in_z_random = 5 )
+{
+
+	linear_plane = generate_square_2d_array(in_max_levels,in_z_top=in_z_delta,in_z_random=in_z_random);
 
 	// now make the landscape
 	//landscape = make_landscape(cornerelev, in_max_levels, randfield);
@@ -95,26 +110,31 @@ module terrain( in_seed = -1000, in_max_levels = 4, in_width = 100, in_z_delta =
     }
 }
 
-function generate_square_2d_array(level, Ztarget) =
-    let(size = pow(2, level))
+function generate_square_2d_array(in_level=2, in_z_top=0,in_z_random=1) =
+	//HACK: the generation has the Z wonky, i divide by 10 to refactor
+    let(size = pow(2, in_level))
     [
-        for (y = [0 : size - 1]) [
+        for (y = [0 : size - 1])
+		[
             for (x = [0 : size - 1])
-                interpolate(x, y, size, Ztarget)
-        ]
+                interpolate(x, y, size, in_z_top/10)
+			
+        ]+rands(-0.5*in_z_random/10,0.5*in_z_random/10,size)
     ];
 
 // Helper function to interpolate values
 function interpolate(x, y, size, Ztarget) =
     let(
-        cx = size / 2 - 0.5, // Center x coordinate
-        cy = size / 2 - 0.5, // Center y coordinate
-        d = sqrt(pow(x - cx, 2) + pow(y - cy, 2)),
-        max_d = sqrt(pow(cx, 2) + pow(cy, 2)) // Maximum distance from center
+        cx = size / 2 -0.5, // Center x coordinate
+        cy = size / 2 -0.5, // Center y coordinate
+		kx = 1-abs((x-cx)/cx),
+		ky = 1-abs((y-cy)/cy),
+		d = kx*ky
     )
-    Ztarget * (1 - d / max_d);
+    Ztarget * (d);
 
-terrain( in_max_levels = 3, in_z_delta = 10);
+//terrain( in_max_levels = 3, in_z_delta = 10);
+//hill( in_max_levels = 3, in_z_delta = 15, in_erosion=1);
 
 /*
 

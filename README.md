@@ -49,7 +49,29 @@ By increasing elevation, I can put a pause and change filament to have colored r
 
 My K1 supports 25 tiles printed at once. I used two color changes to do a base white (cheap) than do the green for the grass, then return to the white for the road and be ready for the next batch done the same way.
 
-![Print 25 Tiles](/images/2024-12-23_12_25-25-Grass-Road-Tiles.png)
+![Slice 25 Tiles](/images/2024-12-23_12_25-25-Grass-Road-Tiles.png)
+
+Printed the plate with 25 mixed tiles and two colors, green for base, white for the road, it came out great!
+
+![25 Grass Road Tiles on K1 Plate](/images/25X-Grass-Road-Tiles-Plate.jpg)
+
+Some pins need to be deeper when the generation gives a low Z.
+
+![25 Grass Road Tiles](/images/25X-Grass-Road-Tiles.jpg)
+
+## Gridfinity Tile - Grass Church and Road
+
+This tile creates a single church building on top of a platform on top of a hill.
+
+![Slice 9X Church Tiles](/images/9X-Church-Tiles-OptionalRoad.jpg)
+
+I improved the grid generator to select the number of tiles with road, and it will give you a grid with the tiles already mixed road/no road.
+
+I created hill function that modifies the fractal to always creat a hill. The height is not the millimeters you give but is consistent, I would have to dig in the procedural generation to see why the number is what it is.
+
+Created truncated cone function to make a platform. I'd like to make cobblestone patterns on top.
+
+Made the pin deeper from 7 to 10mm as some tiles are too low in Z.
 
 ## Attribution
 

@@ -3,6 +3,24 @@
 //	a tower with top room and triangle roof
 
 
+// Module to create a truncated cone using rotate_extrude and polygon
+module truncated_cone(id_low, id_top, iz_height)
+{
+    // Define the 2D profile for the truncated cone
+    points = [
+		[0,0],
+        [id_low / 2, 0],  // Bottom inner radius point
+        [id_top / 2, iz_height],  // Top inner radius point
+		[0,iz_height]
+    ];
+
+    // Use rotate_extrude to create the 3D shape
+    rotate_extrude($fs=0.1)
+	{
+        polygon(points);
+    }
+}
+
 module house(in_length=30, in_width = 10, in_tall=15 , in_roof_ratio=1/4) {
     // Define the 2D outline of the house
 	translate([-in_width/2,in_length/2,0])

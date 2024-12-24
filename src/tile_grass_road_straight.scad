@@ -11,7 +11,7 @@ n_gridfinity_half_pitch = 41/2;
 //Define the weavy bars I use as roads
 include <road.scad>
 
-module pin( in_x, in_y, in_half_pitch = 41/2, in_z_top = 14, in_z_drill = 7 )
+module pin( in_x, in_y, in_half_pitch = 41/2, in_z_top = 14, in_z_drill = 10 )
 {
 	translate([in_x*in_half_pitch,in_y*in_half_pitch,in_z_top-in_z_drill])
 	linear_extrude(in_z_drill)
