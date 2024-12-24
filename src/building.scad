@@ -77,6 +77,42 @@ module church( in_lenght=20, in_width=13, in_height=20, in_width_building = 6, i
 }
 
 
+module wall(ix_start, iy_start, ix_end, iy_end, in_w=4, in_z_height=12)
+{
+    // Calculate the angle of the wall line
+    dx = ix_end - ix_start;
+    dy = iy_end - iy_start;
+    angle = atan2(dy, dx);
+
+    // Calculate the offset for half the width
+    offset_x = (in_w / 2) * cos(angle + 90);
+    offset_y = (in_w / 2) * sin(angle + 90);
+
+    // Define the polygon vertices
+    linear_extrude(height=in_z_height)
+    polygon([
+        [ix_start + offset_x, iy_start + offset_y],
+        [ix_start - offset_x, iy_start - offset_y],
+        [ix_end - offset_x, iy_end - offset_y],
+        [ix_end + offset_x, iy_end + offset_y]
+    ]);
+}
+
+module wall_with_indent( ix_start, iy_start, ix_end, iy_end, in_w=4, in_z_height=12, in_w_indent = 1, in_z_indent = 3 )
+{
+	difference()
+	{
+		wall(ix_start, iy_start, ix_end, iy_end, in_w, in_z_height=12);
+		translate([0,0,in_z_height-in_z_indent])
+		wall(ix_start, iy_start, ix_end, iy_end, in_w=in_w-in_w_indent, in_z_height=in_z_indent);
+	}
+}
+
+// Example usage
+//wall(0, 0, 0, 20, 8, 10);
+wall_with_indent(ix_start = 0, iy_start = 0, ix_end = 11, iy_end=13, in_w=4, in_z_height=12, in_w_indent = 1.5, in_z_indent=2);
+
+
 //test house
 //house();
 //Test round tower
