@@ -40,7 +40,6 @@ module bar_curved(in_r, in_w, in_z)
 	);
 }
 
-
 module bar_curved_weavy(in_r, in_w, in_z, in_w_amplitude=1/30, in_frequency=2)
 {
 	n_step = 1/100;

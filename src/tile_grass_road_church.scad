@@ -23,13 +23,6 @@ n_gridfinity_half_pitch = 41/2;
 
 n_terrain_roughness = 10;
 
-module pin( in_x, in_y, in_half_pitch = 41/2, in_z_top = 14, in_z_drill = 10 )
-{
-	translate([in_x*in_half_pitch,in_y*in_half_pitch,in_z_top-in_z_drill])
-	linear_extrude(in_z_drill)
-	circle(d=2.5+0.45, $fs=0.1);
-}
-
 //A grass tile with a road going straight through
 module tile_grass_road_church(ib_road=false)
 {

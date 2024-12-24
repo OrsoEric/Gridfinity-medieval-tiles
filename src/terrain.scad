@@ -72,9 +72,30 @@ cornerelev = [[0, 0], [+0, 0]];
 module dummy(){}    // force customizer to stop here if it's active
 
 
-module terrain( in_seed = -1000, in_max_levels = 4, in_width = 100, in_z_delta = 20, in_z_offset = 0, in_erosion = 0 )
+module terrain_seed( in_seed = -1000, in_max_levels = 4, in_width = 100, in_z_delta = 20, in_z_offset = 0, in_erosion = 0 )
 {
 	randfield = scaled2drands(in_seed, cornerelev, in_max_levels);
+
+	// now make the landscape
+	landscape = make_landscape(cornerelev, in_max_levels, randfield);
+
+	// erode the landscape (happens if erosionpasses > 0)
+	plotfield = grayerode(landscape, passes=in_erosion);
+
+	translate([0,0,2.5]) 
+    difference()
+	{
+        surfaceplot(plotfield, xlen=in_width, ylen=in_width, zoffset=in_z_offset, zscale=in_z_delta, box=boxed);
+		roundbevels(cornerbevel, in_width, in_width, 4*in_z_delta, -2*in_z_delta-in_z_offset);
+    }
+}
+
+
+module terrain( in_max_levels = 4, in_width = 100, in_z_delta = 20, in_z_offset = 0, in_erosion = 0 )
+{
+	n_seed = rands( -1000, 1000, 1 );
+	
+	randfield = scaled2drands(n_seed[0], cornerelev, in_max_levels);
 
 	// now make the landscape
 	landscape = make_landscape(cornerelev, in_max_levels, randfield);
@@ -133,7 +154,7 @@ function interpolate(x, y, size, Ztarget) =
     )
     Ztarget * (d);
 
-//terrain( in_max_levels = 3, in_z_delta = 10);
+//terrain( in_max_levels = 2, in_z_delta = 10);
 //hill( in_max_levels = 3, in_z_delta = 15, in_erosion=1);
 
 /*

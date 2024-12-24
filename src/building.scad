@@ -2,6 +2,12 @@
 //	a simple box with triangle roof
 //	a tower with top room and triangle roof
 
+module pin( in_x, in_y, in_half_pitch = 41/2, in_z_top = 14, in_z_drill = 10 )
+{
+	translate([in_x*in_half_pitch,in_y*in_half_pitch,in_z_top-in_z_drill])
+	linear_extrude(in_z_drill)
+	circle(d=2.5+0.45, $fs=0.1);
+}
 
 // Module to create a truncated cone using rotate_extrude and polygon
 module truncated_cone(id_low, id_top, iz_height)
@@ -77,11 +83,11 @@ module church( in_lenght=20, in_width=13, in_height=20, in_width_building = 6, i
 }
 
 
-module wall(ix_start, iy_start, ix_end, iy_end, in_w=4, in_z_height=12)
+module wall(i_start, i_end, in_w=4, in_z_height=12)
 {
     // Calculate the angle of the wall line
-    dx = ix_end - ix_start;
-    dy = iy_end - iy_start;
+    dx = i_end[0] - i_start[0];
+    dy = i_end[1] - i_start[1];
     angle = atan2(dy, dx);
 
     // Calculate the offset for half the width
@@ -91,26 +97,139 @@ module wall(ix_start, iy_start, ix_end, iy_end, in_w=4, in_z_height=12)
     // Define the polygon vertices
     linear_extrude(height=in_z_height)
     polygon([
-        [ix_start + offset_x, iy_start + offset_y],
-        [ix_start - offset_x, iy_start - offset_y],
-        [ix_end - offset_x, iy_end - offset_y],
-        [ix_end + offset_x, iy_end + offset_y]
+        [i_start[0] + offset_x, i_start[1] + offset_y],
+        [i_start[0] - offset_x, i_start[1] - offset_y],
+        [i_end[0] - offset_x, i_end[1] - offset_y],
+        [i_end[0] + offset_x, i_end[1] + offset_y]
     ]);
 }
 
-module wall_with_indent( ix_start, iy_start, ix_end, iy_end, in_w=4, in_z_height=12, in_w_indent = 1, in_z_indent = 3 )
+module wall_with_indent( i_start, i_end, in_w=4, in_z_height=12, in_w_indent = 1, in_z_indent = 3 )
 {
 	difference()
 	{
-		wall(ix_start, iy_start, ix_end, iy_end, in_w, in_z_height=12);
+		wall(i_start, i_end, in_w, in_z_height=12);
 		translate([0,0,in_z_height-in_z_indent])
-		wall(ix_start, iy_start, ix_end, iy_end, in_w=in_w-in_w_indent, in_z_height=in_z_indent);
+		wall(i_start, i_end, in_w=in_w-in_w_indent, in_z_height=in_z_indent);
 	}
 }
 
-// Example usage
-//wall(0, 0, 0, 20, 8, 10);
-wall_with_indent(ix_start = 0, iy_start = 0, ix_end = 11, iy_end=13, in_w=4, in_z_height=12, in_w_indent = 1.5, in_z_indent=2);
+
+// OpenSCAD function to calculate bounding box of a polygon
+function calculate_bounds(polygon_points) = [
+    // Compute the bounding box
+    min([for (point = polygon_points) point[0]]), // xmin
+    min([for (point = polygon_points) point[1]]), // ymin
+    max([for (point = polygon_points) point[0]]), // xmax
+    max([for (point = polygon_points) point[1]])  // ymax
+];
+
+//I create a slab with houses on it, and cut out to form a polygon
+module city( i_area, iz_plaza_height = 6, in_num_houses_small = 40, in_num_houses_medium = 5 )
+{
+	//Calculate a rectangle that has the given limits
+	bounds = calculate_bounds(i_area);
+	echo("Limits: ", bounds);
+
+	//RECTANGLE OUTER BOUNDING OF POLYGON
+	rectangle =
+	[
+		//xmin ymin
+		[bounds[0],bounds[1]],
+		//xmin ymax
+		[bounds[0],bounds[3]],
+		//xmax ymax
+		[bounds[2],bounds[3]],
+		//xmax ymin
+		[bounds[2],bounds[1]],
+	];
+
+	//NEGATIVE POLYGON MASK
+	n_outer_margin = 10;
+	//create the outer mask that will be needed to extrude
+	outer_box =
+	[
+		//xmin ymin
+		[bounds[0]-n_outer_margin,bounds[1]-n_outer_margin],
+		//xmin ymax
+		[bounds[0]-n_outer_margin,bounds[3]+n_outer_margin],
+		//xmax ymax
+		[bounds[2]+n_outer_margin,bounds[3]+n_outer_margin],
+		//xmax ymin
+		[bounds[2]+n_outer_margin,bounds[1]-n_outer_margin],
+	];
+
+	//CREATE CITY
+	difference()
+	{
+		union()
+		{
+			//Construct the base where the buildings will be placed
+			linear_extrude(iz_plaza_height)
+			polygon( rectangle );
+
+			//Place SMALL houses
+			for (i = [0:in_num_houses_small-1])
+			{
+				// Generate random positions within the polygon boundary
+				//xmin + rand(xmax-xmin)
+				rand_x = bounds[0] + (bounds[2] - bounds[0]) * rands(1, 0, 1)[0];
+				rand_y = bounds[1] + (bounds[3] - bounds[1]) * rands(1, 0, 1)[0];
+				//echo("House Position: ", rand_x,rand_y);
+				translate([rand_x,rand_y,iz_plaza_height])
+				house
+				(
+					in_length=2,
+					in_width =2,
+					in_tall=3
+				);
+			}
+
+			//Place MEDIUM houses
+			for (i = [0:in_num_houses_medium-1])
+			{
+				// Generate random positions within the polygon boundary
+				//xmin + rand(xmax-xmin)
+				rand_x = bounds[0] + (bounds[2] - bounds[0]) * rands(1, 0, 1)[0];
+				rand_y = bounds[1] + (bounds[3] - bounds[1]) * rands(1, 0, 1)[0];
+				//echo("House Position: ", rand_x,rand_y);
+				translate([rand_x,rand_y,iz_plaza_height])
+				house
+				(
+					in_length=3,
+					in_width =2,
+					in_tall=5
+				);
+			}
+
+		}
+		union()
+		{
+			//Negative Polygon Mask to delete what's outside the polygon
+			difference()
+			{
+				//Large bounding box
+				linear_extrude(iz_plaza_height*2)
+				polygon( outer_box );
+				//Poligon that will be negated
+				linear_extrude(iz_plaza_height*2)
+				polygon( i_area );
+			}
+		}
+	}	//CREATE CITY
+
+}
+/*
+city
+(
+	[
+		[18.3, 18.3],
+		[10, 10],
+		[-10, 10],
+		[-18.3, 18.3]
+	]
+);
+*/
 
 
 //test house
@@ -119,3 +238,10 @@ wall_with_indent(ix_start = 0, iy_start = 0, ix_end = 11, iy_end=13, in_w=4, in_
 //round_tower();
 
 //church();
+
+//Test wall
+
+//wall([0,0], [10,20], 8, 10);
+
+//wall_with_indent([18,-18],[11,-13], in_w=4, in_z_height=12, in_w_indent = 1.5, in_z_indent=2);
+
