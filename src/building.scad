@@ -2,6 +2,13 @@
 //	a simple box with triangle roof
 //	a tower with top room and triangle roof
 
+
+//Rounded Poly Library for the heraldry symbol
+//Credits to:
+//IrevDev
+//https://github.com/Irev-Dev/Round-Anything/blob/master/polyround.scad
+include <polyround.scad>
+
 module pin( in_x, in_y, in_half_pitch = 41/2, in_z_top = 14, in_z_drill = 10 )
 {
 	translate([in_x*in_half_pitch,in_y*in_half_pitch,in_z_top-in_z_drill])
@@ -45,8 +52,69 @@ module house(in_length=30, in_width = 10, in_tall=15 , in_roof_ratio=1/4) {
 		]
 	);
 }
- 
-module round_tower(ir_stalk = 5, ir_top = 7, iz_height = 30, in_stalk_ratio = 4/7, in_roof_ratio = 2/7) {
+
+/*
+function sum(v, dflt=0) =
+    _sum(v,v[0]*0);
+
+function _sum(v,_total,_i=0) = _i>=len(v) ? _total : _sum(v,_total+v[_i], _i+1);
+
+// Function to compute the [X, Y] average of a 2D vector
+function vector_average_2d(points) =
+    [
+        sum([p[0] for p = points]) / len(points), // Average of X values
+        sum([p[1] for p = points]) / len(points)  // Average of Y values
+    ];
+
+n_sum = sum([2,5,6,90]);
+echo("sum: ", n_sum);
+
+// Example usage
+points = [
+    [18.3, 18.3],
+    [10, 10],
+    [-10, 10],
+    [-18.3, 18.3]
+];
+*/
+
+module herald(iy_height, ix_width,iz_height)
+{
+	r_rounding = (iy_height+iy_height);
+    // Define points relative to width and height
+    ann_points =
+	[
+		//Top point
+        [+0.0 * ix_width, +0.5 *iy_height, +0.01 *r_rounding],
+		//Left point
+		[+0.5 * ix_width, +0.4 *iy_height, +0.05 *r_rounding],
+		[+0.45 * ix_width, +0.1 *iy_height, +0.2 *r_rounding],
+
+		//Down point (long arc)
+		[+0.0 * ix_width, -0.5 *iy_height, +0.05 *r_rounding],
+		//Right point
+		[-0.45 * ix_width, +0.1 *iy_height, +0.2 *r_rounding],
+		[-0.5 * ix_width, +0.4 *iy_height, +0.05 *r_rounding],
+        
+    ];
+    
+    // Create the polygon with rounded corners and extrude
+    linear_extrude(iz_height)
+    polygon(polyRound(ann_points, 20));
+}
+
+// Example usage with specific width and height
+//herald(20, 10, 5);
+
+module round_tower
+(
+	ir_stalk = 5,
+	ir_top = 7,
+	iz_height = 30,
+	in_stalk_ratio = 4/7,
+	in_roof_ratio = 2/7
+)
+{
     rotate_extrude($fs=0.1)
 	{
         // Define the 2D profile of the tower
@@ -124,7 +192,21 @@ function calculate_bounds(polygon_points) = [
 ];
 
 //I create a slab with houses on it, and cut out to form a polygon
-module city( i_area, iz_plaza_height = 6, in_num_houses_small = 40, in_num_houses_medium = 5 )
+module city
+(	
+	//Polygon where houses are to be spawned
+	i_area,
+	//height of the plaza below the houses
+	iz_plaza_height = 6,
+	//Number of small houses to be procedurally generated
+	in_num_houses_small = 40,
+	//Number of medium houses to be procedurally generated
+	in_num_houses_medium = 5,
+	//Number of towers
+	in_num_towers = 0,
+	//Margins to the polygon where buildings are spawned
+	in_margin = 2
+)
 {
 	//Calculate a rectangle that has the given limits
 	bounds = calculate_bounds(i_area);
@@ -191,8 +273,8 @@ module city( i_area, iz_plaza_height = 6, in_num_houses_small = 40, in_num_house
 			{
 				// Generate random positions within the polygon boundary
 				//xmin + rand(xmax-xmin)
-				rand_x = bounds[0] + (bounds[2] - bounds[0]) * rands(1, 0, 1)[0];
-				rand_y = bounds[1] + (bounds[3] - bounds[1]) * rands(1, 0, 1)[0];
+				rand_x = bounds[0] + in_margin + (bounds[2] - bounds[0] - 2*in_margin) * rands(1, 0, 1)[0];
+				rand_y = bounds[1] + in_margin + (bounds[3] - bounds[1] - 2*in_margin) * rands(1, 0, 1)[0];
 				rand_r = rands(-90,90,1)[0];
 				//echo("House Position: ", rand_x,rand_y);
 				translate([rand_x,rand_y,iz_plaza_height])
@@ -203,6 +285,27 @@ module city( i_area, iz_plaza_height = 6, in_num_houses_small = 40, in_num_house
 					in_width =2,
 					in_tall=5
 				);
+			}
+			if (in_num_towers > 0)
+			{
+			//Place towers
+			for (i = [0:in_num_towers-1])
+			{
+				// Generate random positions within the polygon boundary
+				//xmin + rand(xmax-xmin)
+				rand_x = bounds[0] + in_margin + (bounds[2] - bounds[0] - 2*in_margin) * rands(1, 0, 1)[0];
+				rand_y = bounds[1] + in_margin + (bounds[3] - bounds[1] - 2*in_margin) * rands(1, 0, 1)[0];
+				rand_r = rands(-90,90,1)[0];
+				//echo("House Position: ", rand_x,rand_y);
+				translate([rand_x,rand_y,iz_plaza_height])
+				rotate([0,0,rand_r])
+				round_tower
+				(
+					ir_stalk = 1,
+					ir_top = 1.5,
+					iz_height = 6
+				);
+			}
 			}
 
 		}
@@ -222,17 +325,19 @@ module city( i_area, iz_plaza_height = 6, in_num_houses_small = 40, in_num_house
 	}	//CREATE CITY
 
 }
-/*
-city
-(
-	[
-		[18.3, 18.3],
-		[10, 10],
-		[-10, 10],
-		[-18.3, 18.3]
-	]
-);
-*/
+
+if (false)
+{
+	city
+	(
+		[
+			[18.3, 18.3],
+			[10, 10],
+			[-10, 10],
+			[-18.3, 18.3]
+		]
+	);
+}
 
 
 //test house
