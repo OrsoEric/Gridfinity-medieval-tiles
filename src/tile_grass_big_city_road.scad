@@ -21,7 +21,7 @@ include <road.scad>
 include <building.scad>
 
 //---------------------------------------------------------------------------
-//	CITY 2/4 ADJACENT
+//	CITY 2/4 BLOCK ADJACENT
 //---------------------------------------------------------------------------
 
 module two_quarter_city_block
@@ -180,7 +180,7 @@ module two_quarter_city_block
 }
 
 //---------------------------------------------------------------------------
-//	CITY 2/4 OPPOSITE
+//	CITY BLOCK 2/4 OPPOSITE
 //---------------------------------------------------------------------------
 // This is a long boi
 // A city lengthwise with two grasses flanking it
@@ -403,6 +403,174 @@ module two_quarter_city_block_opposite
 }
 
 //---------------------------------------------------------------------------
+//	CITY BLOCK 3/4
+//---------------------------------------------------------------------------
+
+//three_quarter_city_block(ib_herald=true);
+
+module three_quarter_city_block
+(
+	ir_orientation = 0,
+	in_z_wall_height = 16,
+	in_z_wall_top_height=22,
+	iz_plaza_top_height = 18,
+	iz_short_tower_above_wall=10,
+	iz_tall_tower_above_wall=20,
+	ib_herald = false,
+)
+{
+	n_gridfinity = 41;
+
+	//WALL PARAMETERS
+
+	nw_wall_width = 4;
+
+	//TOWER PARAMETERS
+	n_z_short_tower = in_z_wall_height +iz_short_tower_above_wall;
+	n_z_tall_tower = in_z_wall_height +iz_tall_tower_above_wall;
+
+	//COMPUTE POINTS
+
+	n_corner = n_gridfinity/2-2.2;
+	n_edge = 10;
+
+	start_l = [ -n_corner, +n_corner];
+	end_l = [ -n_edge, +n_edge];
+	end_r = [ +n_edge, +n_edge];
+	start_r = [ +n_corner, +n_corner];
+	
+	//I want three wall chunks and two towers
+
+	//LEFT BOTTOM TOWER
+	translate([start_l[0],start_l[1],in_z_wall_top_height-in_z_wall_height])
+	round_tower
+	(
+		ir_stalk = 2,
+		ir_top = 2.5,
+		iz_height = n_z_short_tower,
+		in_stalk_ratio = 5/7,
+		in_roof_ratio = 1/7
+	);
+
+	//LEFT WALL
+	translate([0,0,in_z_wall_top_height-in_z_wall_height])
+	wall_with_indent
+	(
+		start_l,
+		end_l,
+		in_w=nw_wall_width,
+		in_z_height=in_z_wall_height,
+		in_w_indent = 1.5,
+		in_z_indent=2
+	);
+
+	//LEFT TOP TOWER
+	translate([end_l[0],end_l[1],in_z_wall_top_height-in_z_wall_height])
+	round_tower(ir_stalk = 2, ir_top = 3, iz_height = n_z_tall_tower);
+
+	//FRONT WALL
+	translate([0,0,in_z_wall_top_height-in_z_wall_height])
+	wall_with_indent
+	(
+		end_l,
+		end_r,
+		in_w=nw_wall_width,
+		in_z_height=in_z_wall_height,
+		in_w_indent = 1.5,
+		in_z_indent=2
+	);
+
+	//RIGHT TOP TOWER
+	translate([end_r[0],end_r[1],in_z_wall_top_height-in_z_wall_height])
+	round_tower(ir_stalk = 2, ir_top = 3, iz_height = n_z_tall_tower);
+
+	translate([0,0,in_z_wall_top_height-in_z_wall_height])
+	wall_with_indent
+	(
+		start_r,
+		end_r,
+		in_w=nw_wall_width,
+		in_z_height=in_z_wall_height,
+		in_w_indent = 1.5,
+		in_z_indent=2
+	);
+
+	//RIGHT BOTTOM TOWER
+	translate([start_r[0],start_r[1],in_z_wall_top_height-in_z_wall_height])
+	round_tower
+	(
+		ir_stalk = 2,
+		ir_top = 2.5,
+		iz_height = n_z_short_tower,
+		in_stalk_ratio = 5/7,
+		in_roof_ratio = 1/7
+	);
+
+
+	//EDGE TOWER (cleverly rounds the corner
+	translate([n_gridfinity/2-3.4,-(n_gridfinity/2-3.4),in_z_wall_top_height-in_z_wall_height])
+	round_tower
+	(
+		ir_stalk = 3.5,
+		ir_top = 3.5,
+		iz_height = in_z_wall_height+2,
+		in_stalk_ratio = 1/7,
+		in_roof_ratio = 1/7
+	);
+
+	//EDGE TOWER (cleverly rounds the corner
+	translate([-n_gridfinity/2+3.4,-(n_gridfinity/2-3.4),in_z_wall_top_height-in_z_wall_height])
+	round_tower
+	(
+		ir_stalk = 3.5,
+		ir_top = 3.5,
+		iz_height = in_z_wall_height+2,
+		in_stalk_ratio = 1/7,
+		in_roof_ratio = 1/7
+	);
+
+
+
+
+	//CITY PLAZA
+	//Platform where the buildings are spawned
+	translate([0,0,in_z_wall_top_height-in_z_wall_height])
+	city
+	(
+		[
+			//BOT LEFT
+			[-n_corner, -n_gridfinity/2],
+			[-n_gridfinity/2, -n_corner],
+			//TOP LEFT
+			//start_l,
+			[-n_gridfinity/2, +n_corner],
+			end_l,
+			end_r,
+			//TOP RIGHT
+			//start_r
+			[+n_gridfinity/2, +n_corner],
+			//BOT RIGHT
+			[+n_gridfinity/2, -n_corner],
+			[+n_corner, -n_gridfinity/2]
+			
+		],
+		iz_plaza_height = iz_plaza_top_height-in_z_wall_top_height+in_z_wall_height,
+		in_num_houses_small = 120,
+		in_num_houses_medium = 20,
+		in_num_towers = 15
+	);
+	
+	//HERALD
+	if (ib_herald==true)
+	{
+		//Instance of an herald
+		translate([0,0, iz_plaza_top_height])
+		rotate([0,0,180])
+		herald(9,6,7);	
+	}
+}
+
+//---------------------------------------------------------------------------
 //	TILE CITY 2/4
 //---------------------------------------------------------------------------
 
@@ -611,156 +779,88 @@ module tile_grass_two_quarter_city_opposite
 	}
 }
 
+//---------------------------------------------------------------------------
+//	TILE CITY 3/4
+//---------------------------------------------------------------------------
+
+tile_grass_three_quarter_city_road(ib_herald=true,ib_road=true);
+
+//A grass tile with a road going straight through
+module tile_grass_three_quarter_city_road
+(
+	ib_road = false,
+	ib_herald = false,
+	iz_road_height = 9,
+	iz_road_top_height = 14
+)
+{	
+	n_z_wall_top_height = 20;
+	n_z_city_top_height = 16;
+	n_z_wall_height = 15;
+
+	difference()
+	{
+		union()
+		{
+			//Create a grifinity tile
+			grid_block
+			(
+				num_x=1,
+				num_y=1,
+				num_z=0.5,
+				magnet_diameter=0,
+				screw_depth=0
+			);
+			//On top, create a fractal terrain
+			translate([0,0,6])
+			terrain
+			(
+				in_max_levels = 5,
+				in_width = 41,
+				in_z_delta = 6,
+				in_z_offset = 1.5,
+				in_erosion=0
+			);
+			
+			three_quarter_city_block
+			(
+				in_z_wall_height = n_z_wall_height,
+				in_z_wall_top_height = n_z_wall_top_height,
+				iz_plaza_top_height = n_z_city_top_height,
+				ib_herald = ib_herald
+			);
+			if (ib_road == true)
+			{
+				translate([0,20.5-5,iz_road_top_height-iz_road_height])
+				rotate([0,0,-90])
+				bar_sin_indented
+				(
+					in_l = 10,
+					in_w = 7,
+					in_z = iz_road_height,
+					in_w_amplitude = 0,
+					iw_indent = 1.5,
+					iz_indent = 1,
+					in_frequency=0
+				);
+			}
+		}
+		union()
+		{
+			//Drill the city block
+			pin(+0.0, -0.8,in_z_top = n_z_wall_top_height+4, in_z_drill = 14);
+			//Drill the grass
+			pin(+0.4, +0.8);
+			pin(-0.4, +0.8);
+			//DRILL the road
+			pin(0.0, +0.8);
+		}
+	}
+}
 
 //---------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------
-
-module tile_grass_quarter_city_one_road(iz_road_height = 9, iz_road_top_height = 14)
-{
-	difference()
-	{
-		union()
-		{
-			tile_grass_city_quarter();	
-			translate([0,-5,iz_road_top_height-iz_road_height])
-			rotate([0,0,90])
-			bar_sin_indented
-			(
-				in_l = 41-10,
-				in_w = 7,
-				in_z = iz_road_height,
-				in_w_amplitude = 2,
-				iw_indent = 1.5,
-				iz_indent = 1,
-				in_frequency=1
-			);
-		}
-		union()
-		{
-			//Drill the grassland
-			pin(0.05, -0.8);
-			//Drill the road
-			pin(0.8, +0.4);
-		}
-	}
-
-}
-
-module tile_grass_quarter_city_two_road_straight(iz_road_height = 9, iz_road_top_height = 14)
-{
-	difference()
-	{
-		union()
-		{
-			tile_grass_city_quarter();	
-			translate([0,0,iz_road_top_height-iz_road_height])
-			bar_sin_indented
-			(
-				in_l = 41,
-				in_w = 7,
-				in_z = iz_road_height,
-				in_w_amplitude = 2,
-				iw_indent = 1.5,
-				iz_indent = 1,
-				in_frequency=1
-			);
-		}
-		union()
-		{
-			//Drill the grassland
-			pin(-0, -0.8);
-			//Drill the road
-			pin(0.8, +0.05);
-		}
-	}
-}
-
-module tile_grass_quarter_city_two_road_turn_left(iz_road_height = 9, iz_road_top_height = 14)
-{
-	difference()
-	{
-		union()
-		{
-			tile_grass_city_quarter();	
-			translate([0,0,iz_road_top_height-iz_road_height])
-			bar_curved_weavy_indented
-			(
-				in_r=20.5,
-				in_z=iz_road_height
-			);
-		}
-		union()
-		{
-			//Drill the grassland
-			pin(-0.8, -0.8);
-			//Drill the road
-			pin(0, -0.8);
-		}
-	}
-}
-
-module tile_grass_quarter_city_two_road_turn_right(iz_road_height = 9, iz_road_top_height = 14)
-{
-	difference()
-	{
-		union()
-		{
-			tile_grass_city_quarter();	
-			translate([0,0,iz_road_top_height-iz_road_height])
-			rotate([0,0,90])
-			bar_curved_weavy_indented
-			(
-				in_r=20.5,
-				in_z=iz_road_height
-			);
-		}
-		union()
-		{
-			//Drill the grassland
-			pin(+0.8, -0.8);
-			//Drill the road
-			pin(0.05, -0.8);
-		}
-	}
-}
-
-module tile_grass_quarter_city_three_roads(iz_road_height = 9, iz_road_top_height = 14)
-{
-	n_w_road_width = 7;
-	n_z_road_indent = 1;
-	difference()
-	{
-		union()
-		{
-			tile_grass_city_quarter(0);	
-			//Crerate two weavy roads
-			translate([0,0,iz_road_top_height-iz_road_height])
-			bar_sin(41, n_w_road_width,iz_road_height, 1, 2);
-			rotate([0,0,90])
-			translate([-41/4,0,iz_road_top_height-iz_road_height])
-			bar_sin(41/2, n_w_road_width,iz_road_height, 1, 1);
-		}
-		union()
-		{
-			//Subtract the indent from the whole
-			translate([0,0,iz_road_top_height-n_z_road_indent])
-			bar_sin(41, n_w_road_width-1.5, n_z_road_indent, 1, 2);
-			rotate([0,0,90])
-			translate([-41/4,0,iz_road_top_height-n_z_road_indent])
-			bar_sin(41/2, n_w_road_width-1.5, n_z_road_indent, 1, 1);
-			
-			//Drill the roads
-			pin(+0.05, -0.8);
-			pin(+0.8, -0.05);
-			pin(-0.8, +0.05);
-
-			//Drill the grasslands
-			pin(-0.8, -0.8);
-			pin(+0.8, -0.8);
-		}
-	}
-}
 
 module grid_of_tiles_big_city
 (
@@ -774,6 +874,10 @@ module grid_of_tiles_big_city
 	in_two_quarter_city_with_road_turn_with_herald = 1,
 	in_two_quarter_city_opposite = 1,
 	in_two_quarter_city_opposite_with_herald = 1,
+	in_three_quarter_city = 1,
+	in_three_quarter_city_with_herald = 1,
+	in_three_quarter_city_with_road = 1,
+	in_three_quarter_city_with_road_and_herald = 1
 )
 {
     for (x = [0:in_cols-1])
@@ -823,6 +927,74 @@ module grid_of_tiles_big_city
 		{
 			tile_grass_two_quarter_city_opposite(ib_herald=true);
 		}	
+		else if
+		(
+			n <
+			in_two_quarter_city+
+			in_two_quarter_city_with_herald+
+			in_two_quarter_city_with_road_turn+
+			in_two_quarter_city_with_road_turn_with_herald+
+			in_two_quarter_city_opposite+
+			in_two_quarter_city_opposite_with_herald+
+			in_three_quarter_city
+		)
+		{
+			tile_grass_three_quarter_city_road(ib_herald=false, ib_road=false);
+		}
+		else if
+		(
+			n <
+			in_two_quarter_city+
+			in_two_quarter_city_with_herald+
+			in_two_quarter_city_with_road_turn+
+			in_two_quarter_city_with_road_turn_with_herald+
+			in_two_quarter_city_opposite+
+			in_two_quarter_city_opposite_with_herald+
+			in_three_quarter_city +
+			in_three_quarter_city_with_herald
+		)
+		{
+			tile_grass_three_quarter_city_road(ib_herald=true, ib_road=false);
+		}
+		else if
+		(
+			n <
+			in_two_quarter_city+
+			in_two_quarter_city_with_herald+
+			in_two_quarter_city_with_road_turn+
+			in_two_quarter_city_with_road_turn_with_herald+
+			in_two_quarter_city_opposite+
+			in_two_quarter_city_opposite_with_herald+
+			in_three_quarter_city +
+			in_three_quarter_city_with_herald +
+			in_three_quarter_city_with_road
+		)
+		{
+			tile_grass_three_quarter_city_road(ib_herald=false, ib_road=true);
+		}
+		else if
+		(
+			n <
+			in_two_quarter_city+
+			in_two_quarter_city_with_herald+
+			in_two_quarter_city_with_road_turn+
+			in_two_quarter_city_with_road_turn_with_herald+
+			in_two_quarter_city_opposite+
+			in_two_quarter_city_opposite_with_herald+
+			in_three_quarter_city +
+			in_three_quarter_city_with_herald +
+			in_three_quarter_city_with_road +
+			in_three_quarter_city_with_road_and_herald
+		)
+		{
+			tile_grass_three_quarter_city_road(ib_herald=true, ib_road=true);
+		}
+
+
+		else
+		{
+			//PLACE NOTHING
+		}
 
     }
 }
@@ -863,4 +1035,4 @@ if (false)
 
 //tile_grass_two_quarter_city_opposite(true);
 
-grid_of_tiles_big_city(4,4);
+//grid_of_tiles_big_city(4,4);
