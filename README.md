@@ -100,9 +100,13 @@ For the buildings, I reuse the house module I made. I tried several way, and the
 
 ![Procedural Buildings](/images/city-procedural-generation.jpg)
 
-Combile All and I have the 1/4 city tile that scales to 2/4 3/4 and 4/4 hopefully. Just add optional roads and pins on the terrain.
+Combine All and I have the 1/4 city tile that scales to 2/4 3/4 and 4/4 hopefully. Just add optional roads and pins on the terrain.
 
-![City Tile](City-Tile.png)
+![City Tile](/images/City-Tile.png)
+
+I added two functions to render tiles with multiple 1/4 cities and 1/4 city tiles with multiple road configuration and made a 25X city tile plate that fits my printer with one color change from green to white at layer 158.
+
+![25X City Tiles](/images/25-Quarter-City-Road-Tiles.png)
 
 ## Attribution
 
