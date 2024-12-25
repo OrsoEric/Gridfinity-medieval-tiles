@@ -83,6 +83,8 @@ Placing alongside the road tiles works great!
 
 ## Gridfinity City Tile
 
+### One Quarter City
+
 Taking inspiration from carcassone, I can a number of sides to be cities, so I can tile them and build cities of arbitrary size for my campaigns.
 
 First hurdle is 1/4 city generation. I need the city to be higher than the road to get away from terrain and have margin for the filament change.
@@ -107,6 +109,30 @@ Combine All and I have the 1/4 city tile that scales to 2/4 3/4 and 4/4 hopefull
 I added two functions to render tiles with multiple 1/4 cities and 1/4 city tiles with multiple road configuration and made a 25X city tile plate that fits my printer with one color change from green to white at layer 158.
 
 ![25X City Tiles](/images/25-Quarter-City-Road-Tiles.png)
+
+### Two Quarter City
+
+For the two quarter city, the points for two walls have been moved up to the diagonal. Added a curved road in front of the walls.
+
+![Two Quarter Adjacent with Road](/images/City-Two-Quarter-Adjacent.png)
+
+Another configuration of the two quarter city is a long boi flanked by two grass sides. Added an herald symbol to signify a special building. The city block function is flexible enough to accomodate the eight point poly that define the perimeter of the city. Increased building density to properly fill it.
+
+![Two Quarter Adjacent with Road](/images/City-two-quarter-opposite.png)
+
+Three quarter city with an option for an incoming road, and an option for the heraldry symbol.
+
+![Three Quarter with Road](/images/City-three-quarter-road.png)
+
+Finally a four sided city, it felt right to add a large building on it.
+
+![Four Quarter with Road](/images/City-four-quarter.png)
+
+Finally all the city tiles have been mixed and rendered into a plate. With a grid function. Like all other platers, refreshing changes the location of the buildings and the shape of the terrain.
+
+![Plate with 25 Big City Tiles](/images/25X-big-city-plate.png)
+
+Pause added at layer 128 to switch from green to white.
 
 ## Attribution
 
