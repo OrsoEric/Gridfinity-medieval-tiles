@@ -81,6 +81,29 @@ Placing alongside the road tiles works great!
 
 ![9X Church Tiles Printed](/images/9X-Church-Tiles-Placed.jpg)
 
+## Gridfinity City Tile
+
+Taking inspiration from carcassone, I can a number of sides to be cities, so I can tile them and build cities of arbitrary size for my campaigns.
+
+First hurdle is 1/4 city generation. I need the city to be higher than the road to get away from terrain and have margin for the filament change.
+
+The walls are a module that go from point to point and have a top indent. One day I'd like to texture the wall.
+
+![Procedural Buildings](/images/Wall.png)
+
+I decided to have three linear walls dotted with four rounded towers, and behind a plaza where the buildings are placed. The rounded walls of the tower round the corners nicely and hide the connection. Anotherr advantge is that I can select point to get 2/4 and 3/4 cities without changing the generation rules, just the points.
+
+![City Walls](/images/City-Walls.png)
+
+
+For the buildings, I reuse the house module I made. I tried several way, and the way to go is to place random houses of small and medium size on a rectangle, then extrude the polygon that makes the city. This approach shoud scale to larger city tiles with different shape.
+
+![Procedural Buildings](/images/city-procedural-generation.jpg)
+
+Combile All and I have the 1/4 city tile that scales to 2/4 3/4 and 4/4 hopefully. Just add optional roads and pins on the terrain.
+
+![City Tile](City-Tile.png)
+
 ## Attribution
 
 The fractal generation in terrain.scad has been copied and modified from: [Author](https://www.printables.com/@Anachronist) [Repository](https://www.printables.com/model/129126-procedural-weathered-fractal-terrain-in-openscad/files) inder a CC 4.0 license.
