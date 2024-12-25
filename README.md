@@ -73,6 +73,14 @@ Created truncated cone function to make a platform. I'd like to make cobblestone
 
 Made the pin deeper from 7 to 10mm as some tiles are too low in Z.
 
+Set a pause at layer 158 to switch from green to white. Had some bleeding on a few taller hills.
+
+![9X Church Tiles Printed](/images/9X-Church-Tiles-Printed.jpg)
+
+Placing alongside the road tiles works great!
+
+![9X Church Tiles Printed](/images/9X-Church-Tiles-Placed.jpg)
+
 ## Attribution
 
 The fractal generation in terrain.scad has been copied and modified from: [Author](https://www.printables.com/@Anachronist) [Repository](https://www.printables.com/model/129126-procedural-weathered-fractal-terrain-in-openscad/files) inder a CC 4.0 license.

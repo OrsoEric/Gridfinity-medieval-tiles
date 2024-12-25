@@ -38,7 +38,6 @@ module quarter_city_block
 	iz_tall_tower_above_wall=20
 )
 {
-
 	n_gridfinity = 41;
 
 	//WALL PARAMETERS
@@ -183,7 +182,7 @@ module tile_grass_city_quarter(ir_second_block = 0)
 				in_max_levels = 5,
 				in_width = 41,
 				in_z_delta = 6,
-				in_z_offset = 1,
+				in_z_offset = 1.5,
 				in_erosion=0
 			);
 			
@@ -212,12 +211,15 @@ module tile_grass_city_quarter(ir_second_block = 0)
 		{
 			//Drill the city block
 			pin(-0.3, +0.8,in_z_top = n_z_wall_top_height, in_z_drill = 10);
-			//Drill the grassland
-			pin(-0.0, -0.0);
 			//Drill the optional second city quarter
 			if (ir_second_block == 90)
 			{
 				pin(-0.8, -0.3,in_z_top = n_z_wall_top_height, in_z_drill = 10);
+			}
+			else
+			{
+				//Drill the grassland
+				pin(-0.8, 0.4);
 			}
 			if (ir_second_block == 180)
 			{
@@ -231,12 +233,158 @@ module tile_grass_city_quarter(ir_second_block = 0)
 	}
 }
 
+module tile_grass_quarter_city_one_road(iz_road_height = 9, iz_road_top_height = 14)
+{
+	difference()
+	{
+		union()
+		{
+			tile_grass_city_quarter();	
+			translate([0,-5,iz_road_top_height-iz_road_height])
+			rotate([0,0,90])
+			bar_sin_indented
+			(
+				in_l = 41-10,
+				in_w = 7,
+				in_z = iz_road_height,
+				in_w_amplitude = 2,
+				iw_indent = 1.5,
+				iz_indent = 1,
+				in_frequency=1
+			);
+		}
+		union()
+		{
+			//Drill the grassland
+			pin(0.05, -0.8);
+			//Drill the road
+			pin(0.8, +0.4);
+		}
+	}
+
+}
+
+module tile_grass_quarter_city_two_road_straight(iz_road_height = 9, iz_road_top_height = 14)
+{
+	difference()
+	{
+		union()
+		{
+			tile_grass_city_quarter();	
+			translate([0,0,iz_road_top_height-iz_road_height])
+			bar_sin_indented
+			(
+				in_l = 41,
+				in_w = 7,
+				in_z = iz_road_height,
+				in_w_amplitude = 2,
+				iw_indent = 1.5,
+				iz_indent = 1,
+				in_frequency=1
+			);
+		}
+		union()
+		{
+			//Drill the grassland
+			pin(-0, -0.8);
+			//Drill the road
+			pin(0.8, +0.05);
+		}
+	}
+}
+
+module tile_grass_quarter_city_two_road_turn_left(iz_road_height = 9, iz_road_top_height = 14)
+{
+	difference()
+	{
+		union()
+		{
+			tile_grass_city_quarter();	
+			translate([0,0,iz_road_top_height-iz_road_height])
+			bar_curved_weavy_indented
+			(
+				in_r=20.5,
+				in_z=iz_road_height
+			);
+		}
+		union()
+		{
+			//Drill the grassland
+			pin(-0.8, -0.8);
+			//Drill the road
+			pin(0, -0.8);
+		}
+	}
+}
+
+module tile_grass_quarter_city_two_road_turn_right(iz_road_height = 9, iz_road_top_height = 14)
+{
+	difference()
+	{
+		union()
+		{
+			tile_grass_city_quarter();	
+			translate([0,0,iz_road_top_height-iz_road_height])
+			rotate([0,0,90])
+			bar_curved_weavy_indented
+			(
+				in_r=20.5,
+				in_z=iz_road_height
+			);
+		}
+		union()
+		{
+			//Drill the grassland
+			pin(+0.8, -0.8);
+			//Drill the road
+			pin(0.05, -0.8);
+		}
+	}
+}
+
+module tile_grass_quarter_city_three_roads(iz_road_height = 9, iz_road_top_height = 14)
+{
+	n_w_road_width = 7;
+	n_z_road_indent = 1;
+	difference()
+	{
+		union()
+		{
+			tile_grass_city_quarter(0);	
+			//Crerate two weavy roads
+			translate([0,0,iz_road_top_height-iz_road_height])
+			bar_sin(41, n_w_road_width,iz_road_height, 1, 2);
+			rotate([0,0,90])
+			translate([-41/4,0,iz_road_top_height-iz_road_height])
+			bar_sin(41/2, n_w_road_width,iz_road_height, 1, 1);
+		}
+		union()
+		{
+			//Subtract the indent from the whole
+			translate([0,0,iz_road_top_height-n_z_road_indent])
+			bar_sin(41, n_w_road_width-1.5, n_z_road_indent, 1, 2);
+			rotate([0,0,90])
+			translate([-41/4,0,iz_road_top_height-n_z_road_indent])
+			bar_sin(41/2, n_w_road_width-1.5, n_z_road_indent, 1, 1);
+			
+			//Drill the roads
+			pin(+0.05, -0.8);
+			pin(+0.8, -0.05);
+			pin(-0.8, +0.05);
+
+			//Drill the grasslands
+			pin(-0.8, -0.8);
+			pin(+0.8, -0.8);
+		}
+	}
+}
+
 module grid_of_tiles_no_road
 (
 	in_rows = 1,
 	in_cols = 1,
 	spacing = 42,
-	in_one_city_quarter = 6,
+	in_one_city_quarter = 5,
 	in_two_city_quarters_adjacent = 3,
 	in_two_city_quarters_opposite = 3
 )
@@ -258,10 +406,54 @@ module grid_of_tiles_no_road
 		else if(n < in_one_city_quarter +in_two_city_quarters_adjacent+in_two_city_quarters_opposite)
 		{
 			tile_grass_city_quarter(180);
+
+
 		}
 			
     }
 }
+
+module grid_of_tiles_road
+(
+	in_rows = 1,
+	in_cols = 1,
+	spacing = 42,
+	in_city_quarter_one_roads = 3,
+	in_city_quarter_two_roads_straight = 3,
+	in_city_quarter_two_roads_turn_left = 3,
+	in_city_quarter_two_roads_turn_right = 3,
+	in_city_quarter_three_roads = 3,
+)
+{
+    for (x = [0:in_cols-1])
+    for (y = [0:in_rows-1])
+    {
+		n=x*in_cols+y;
+		echo("X Y N: ", x, y, n);
+		translate([x * spacing, y * spacing, 0])
+		if(n < in_city_quarter_two_roads_straight)
+		{
+			tile_grass_quarter_city_one_road();
+		}
+		else if(n < in_city_quarter_one_roads+ in_city_quarter_two_roads_straight)
+		{	
+			tile_grass_quarter_city_two_road_straight();
+		}
+		else if(n < in_city_quarter_one_roads+ in_city_quarter_two_roads_straight+in_city_quarter_two_roads_turn_left)
+		{	
+			tile_grass_quarter_city_two_road_turn_left();
+		}	
+		else if(n < in_city_quarter_one_roads+ in_city_quarter_two_roads_straight+in_city_quarter_two_roads_turn_left+in_city_quarter_two_roads_turn_right)
+		{	
+			tile_grass_quarter_city_two_road_turn_right();
+		}	
+		else if(n < in_city_quarter_one_roads+ in_city_quarter_two_roads_straight+in_city_quarter_two_roads_turn_left+in_city_quarter_two_roads_turn_right+in_city_quarter_three_roads)
+		{	
+			tile_grass_quarter_city_three_roads();
+		}			
+    }
+}
+
 
 if (false)
 {
@@ -274,7 +466,21 @@ if (false)
 	);
 }
 
+
+//tile_grass_city_quarter(0);
+
 //tile_grass_city_quarter(180);
 
-grid_of_tiles_no_road(4,3);
+//tile_grass_quarter_city_one_road();
 
+//tile_grass_quarter_city_two_road_straight();
+
+//tile_grass_quarter_city_two_road_turn_left();
+
+//tile_grass_quarter_city_two_road_turn_right();
+
+//tile_grass_quarter_city_three_roads();
+
+//grid_of_tiles_no_road(4,4);
+
+grid_of_tiles_road(4,4);

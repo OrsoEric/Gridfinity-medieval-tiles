@@ -11,12 +11,8 @@ n_gridfinity_half_pitch = 41/2;
 //Define the weavy bars I use as roads
 include <road.scad>
 
-module pin( in_x, in_y, in_half_pitch = 41/2, in_z_top = 14, in_z_drill = 10 )
-{
-	translate([in_x*in_half_pitch,in_y*in_half_pitch,in_z_top-in_z_drill])
-	linear_extrude(in_z_drill)
-	circle(d=2.5+0.3, $fs=0.1);
-}
+//Pin
+include <building.scad>
 
 //A grass tile with a road going straight through
 module tile_grass_road(in_seed)
@@ -38,7 +34,7 @@ module tile_grass_road(in_seed)
 			grid_block(num_x=1, num_y=1, num_z=0.5, magnet_diameter=0, screw_depth=0);
 			//On top, create a fractal terrain
 			translate([0,0,6])
-			terrain(in_seed = in_seed, in_max_levels = 5, in_width = 41, in_z_delta = 4, in_z_offset = 1);
+			terrain(in_max_levels = 5, in_width = 41, in_z_delta = 4, in_z_offset = 1);
 			//on top create a weavy road
 			translate([0,0,n_z_road_top_height-n_z_road_thickness])
 			bar_sin(41, n_w_road_width,n_z_road_thickness, 1, 2);
@@ -86,7 +82,7 @@ module tile_grass_crossroad_four_way(in_seed)
 			grid_block(num_x=1, num_y=1, num_z=0.5, magnet_diameter=0, screw_depth=0);
 			//On top, create a fractal terrain
 			translate([0,0,6])
-			terrain(in_seed = in_seed, in_max_levels = 5, in_width = 41, in_z_delta = 4, in_z_offset = 1);
+			terrain(in_max_levels = 5, in_width = 41, in_z_delta = 4, in_z_offset = 1);
 			//on top create a weavy road
 			
 			translate([0,0,n_z_road_top_height-n_z_road_thickness])
@@ -158,9 +154,8 @@ module tile_grass_crossroad_three_way(in_seed)
 			grid_block(num_x=1, num_y=1, num_z=0.5, magnet_diameter=0, screw_depth=0);
 			//On top, create a fractal terrain
 			translate([0,0,6])
-			terrain(in_seed = in_seed, in_max_levels = 5, in_width = 41, in_z_delta = 4, in_z_offset = 1);
+			terrain(in_max_levels = 5, in_width = 41, in_z_delta = 4, in_z_offset = 1);
 			//on top create a weavy road
-			
 			translate([-41/4,0,n_z_road_top_height-n_z_road_thickness])
 			bar_sin(41/2, n_w_road_width,n_z_road_thickness, 1, 1);
 			rotate([0,0,90])
@@ -220,12 +215,12 @@ module grid_of_tiles_three_ways(in_rows, in_cols, spacing, in_seed_start)
 }
 
 
-//tile_grass_road(190);
+tile_grass_road();
 
 //grid_of_tiles(3,3,42,490);
 
 //grid_of_tiles_four_ways(2,2,42,520);
 
-tile_grass_crossroad_three_way(0);
+//tile_grass_crossroad_three_way();
 
 //grid_of_tiles_three_ways(3,2,42,525);
