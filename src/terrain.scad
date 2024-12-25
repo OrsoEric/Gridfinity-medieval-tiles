@@ -46,7 +46,7 @@ erosionpasses = 0;  // [0:4]
 // This is a slow process for high subdivision levels. The console window displays a count of the weathering passes being done.
 
 // sea level (can disable the sea in the 'show' parameter next)
-sealevel = -0.5;
+sealevel = -4;
 // The landscape+sea object has a varying height above and below z=0, and it is positioned with the z=0 value centered at [0,0,zoffset] on the axes. Changing sealevel does not change the position of the object in 3D space, it just changes the position of the sea relative to the origin.
 
 // render a box base for the terrain
@@ -54,7 +54,7 @@ boxed = true;
 // If true, the terrain is rendered with a box base extending 1mm below the lowest point of the terrain. If false, only the landscape surface is rendered.
 
 // what to render
-show = "terrain"; //[terrain,sea,both]
+show = "sea"; //[terrain,sea,both]
 // "terrain" renders the terrain only (boxed or not)
 // "sea" renders the sea only with terrain subtracted from it. This is useful only if you want to print the sea profile on the sides of the box with a multi-color printer.
 // "both" shows a union of the landscape and sea together.
@@ -103,12 +103,24 @@ module terrain( in_max_levels = 4, in_width = 100, in_z_delta = 20, in_z_offset 
 	// erode the landscape (happens if erosionpasses > 0)
 	plotfield = grayerode(landscape, passes=in_erosion);
 
-	translate([0,0,2.5]) 
+	 renderlandscape
+	(
+		plotfield,
+		sealevel,
+		sidelen,
+		zoffset,
+		zscale,
+		boxed,
+		cornerbevel
+	);
+	/*
+	translate([0,0,0]) 
     difference()
 	{
         surfaceplot(plotfield, xlen=in_width, ylen=in_width, zoffset=in_z_offset, zscale=in_z_delta, box=boxed);
 		roundbevels(cornerbevel, in_width, in_width, 4*in_z_delta, -2*in_z_delta-in_z_offset);
     }
+	*/
 }
 
 module hill( in_seed = -1000, in_max_levels = 4, in_width = 100, in_z_delta = 20, in_z_offset = 0, in_erosion = 0, in_z_random = 5 )
@@ -180,12 +192,38 @@ if (show == "terrain") {
 			roundbevels(cornerbevel, sidelen, sidelen, 4*zscale, -2*zscale-zoffset);
     }
 } else if (show == "sea") { // makes sense only if boxed==true
-    difference() {
-        seabox(plotfield, sealevel, sidelen, zoffset, zscale, cornerbevel);
-    surfaceplot(plotfield, xlen=sidelen, ylen=sidelen, zoffset=zoffset, zscale=zscale, box=true);
+    difference()
+	{
+        seabox
+		(
+			plotfield,
+			sealevel,
+			sidelen,
+			zoffset,
+			zscale,
+			cornerbevel
+		);
+		surfaceplot
+		(
+			plotfield,
+			xlen=sidelen,
+			ylen=sidelen,
+			zoffset=zoffset,
+			zscale=zscale,
+			box=true
+		);
     }
 } else // both land and sea together
-    renderlandscape(plotfield, sealevel, sidelen, zoffset, zscale, boxed, cornerbevel);
+    renderlandscape
+	(
+		plotfield,
+		sealevel,
+		sidelen,
+		zoffset,
+		zscale,
+		boxed,
+		cornerbevel
+	);
 
 */
 
@@ -286,9 +324,15 @@ module surfaceplot(elevations, xlen=100, ylen=100, zoffset=0, zscale=30, box=fal
     yrangestep = (yrange[1]-yrange[0]) / (irange-1);
     zmin = min2d(elevations)*zscale+zoffset-1;
     zboff = max(0, zoffset);
-    field3d = [
+    field3d =
+	[
         for(y=[0:irange-1])
-            for(x=[0:irange-1]) [x*xrangestep+xrange[0], y*yrangestep+yrange[0], elevations[y][x]*zscale+zoffset],
+            for(x=[0:irange-1])
+				[
+					x*xrangestep+xrange[0],
+					y*yrangestep+yrange[0],
+					elevations[y][x]*zscale+zoffset
+				],
         if (box) [xrange[0], yrange[0], zmin-zboff],
         if (box) [xrange[0], yrange[1], zmin-zboff],
         if (box) [xrange[1], yrange[0], zmin-zboff],

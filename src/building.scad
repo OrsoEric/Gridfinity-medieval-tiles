@@ -136,7 +136,14 @@ module round_tower
 }
 
 //I use two houses to make a cross, and a round tower to make the bell
-module church( in_lenght=20, in_width=13, in_height=20, in_width_building = 6, in_z_ratio_tower = 2/5)
+module church
+(
+	in_lenght=20,
+	in_width=13,
+	in_height=20,
+	in_width_building = 6,
+	in_z_ratio_tower = 2/5
+)
 {
 	//lengthwise 
 	house(in_lenght, in_width_building, in_height*in_z_ratio_tower);

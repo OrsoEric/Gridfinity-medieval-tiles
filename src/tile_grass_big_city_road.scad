@@ -20,6 +20,10 @@ include <road.scad>
 //Buildings definitions
 include <building.scad>
 
+gz_terrain_translate_up = 8;
+gz_terrain_offset = 1;
+gz_terrain_roughness = 3;
+
 //---------------------------------------------------------------------------
 //	CITY 2/4 BLOCK ADJACENT
 //---------------------------------------------------------------------------
@@ -570,6 +574,134 @@ module three_quarter_city_block
 	}
 }
 
+
+//---------------------------------------------------------------------------
+//	CITY BLOCK 4/4
+//---------------------------------------------------------------------------
+//	This is a full city block
+//	I have no retaining walls
+//	I should put a cathedral here, it's fitting
+//	I place four edge towers
+
+//four_quarter_city_block(ib_herald=true);
+
+module four_quarter_city_block
+(
+	ir_orientation = 0,
+	in_z_wall_height = 16,
+	in_z_wall_top_height=22,
+	iz_plaza_top_height = 18,
+	iz_short_tower_above_wall=10,
+	iz_tall_tower_above_wall=20,
+	ib_herald = false
+)
+{
+	n_gridfinity = 41;
+
+	//WALL PARAMETERS
+
+	nw_wall_width = 4;
+
+	//TOWER PARAMETERS
+	n_z_short_tower = in_z_wall_height +iz_short_tower_above_wall;
+	n_z_tall_tower = in_z_wall_height +iz_tall_tower_above_wall;
+
+	//COMPUTE POINTS
+
+	n_corner = n_gridfinity/2-2.2;
+
+	//EDGE TOWER TOP RIGHT
+	translate([(n_gridfinity/2-3.4),+(n_gridfinity/2-3.4),in_z_wall_top_height-in_z_wall_height])
+	round_tower
+	(
+		ir_stalk = 3.5,
+		ir_top = 3.5,
+		iz_height = in_z_wall_height+2,
+		in_stalk_ratio = 1/7,
+		in_roof_ratio = 1/7
+	);
+
+	//EDGE TOWER TOP LEFT
+	translate([-(n_gridfinity/2-3.4),+(n_gridfinity/2-3.4),in_z_wall_top_height-in_z_wall_height])
+	round_tower
+	(
+		ir_stalk = 3.5,
+		ir_top = 3.5,
+		iz_height = in_z_wall_height+2,
+		in_stalk_ratio = 1/7,
+		in_roof_ratio = 1/7
+	);
+
+	//EDGE TOWER BOTTOM RIGHT
+	translate([(n_gridfinity/2-3.4),-(n_gridfinity/2-3.4),in_z_wall_top_height-in_z_wall_height])
+	round_tower
+	(
+		ir_stalk = 3.5,
+		ir_top = 3.5,
+		iz_height = in_z_wall_height+2,
+		in_stalk_ratio = 1/7,
+		in_roof_ratio = 1/7
+	);
+
+	//EDGE TOWER BOTTOM LEFT
+	translate([-(n_gridfinity/2-3.4),-(n_gridfinity/2-3.4),in_z_wall_top_height-in_z_wall_height])
+	round_tower
+	(
+		ir_stalk = 3.5,
+		ir_top = 3.5,
+		iz_height = in_z_wall_height+2,
+		in_stalk_ratio = 1/7,
+		in_roof_ratio = 1/7
+	);
+
+	//CHURCH
+	translate([0,0,iz_plaza_top_height])
+	church
+	(
+		in_lenght=25,
+		in_width=18,
+		in_height=30,
+		in_width_building = 6,
+		in_z_ratio_tower = 2/6
+	);
+
+
+	//CITY PLAZA
+	//Platform where the buildings are spawned
+	translate([0,0,in_z_wall_top_height-in_z_wall_height])
+	city
+	(
+		[
+			//BOT LEFT
+			[-n_corner, -n_gridfinity/2],
+			[-n_gridfinity/2, -n_corner],
+			//TOP LEFT
+			[-n_gridfinity/2, +n_corner],
+			[-n_corner, +n_gridfinity/2],
+			//TOP RIGHT
+			[+n_corner, +n_gridfinity/2],
+			[+n_gridfinity/2, +n_corner],
+			//BOT RIGHT
+			[+n_gridfinity/2, -n_corner],
+			[+n_corner, -n_gridfinity/2]
+			
+		],
+		iz_plaza_height = iz_plaza_top_height-in_z_wall_top_height+in_z_wall_height,
+		in_num_houses_small = 120,
+		in_num_houses_medium = 20,
+		in_num_towers = 15
+	);
+	
+	//HERALD
+	if (ib_herald==true)
+	{
+		//Instance of an herald
+		translate([0.8*n_corner,0, iz_plaza_top_height])
+		rotate([0,0,0])
+		herald(9,6,7);	
+	}
+}
+
 //---------------------------------------------------------------------------
 //	TILE CITY 2/4
 //---------------------------------------------------------------------------
@@ -606,13 +738,13 @@ module tile_grass_two_quarter_city
 				screw_depth=0
 			);
 			//On top, create a fractal terrain
-			translate([0,0,6])
+			translate([0,0,gz_terrain_translate_up])
 			terrain
 			(
 				in_max_levels = 5,
 				in_width = 41,
-				in_z_delta = 6,
-				in_z_offset = 1.5,
+				in_z_delta = gz_terrain_roughness,
+				in_z_offset = gz_terrain_offset,
 				in_erosion=0
 			);
 			
@@ -672,13 +804,13 @@ module tile_grass_two_quarter_city_with_road_turn
 				screw_depth=0
 			);
 			//On top, create a fractal terrain
-			translate([0,0,6])
+			translate([0,0,gz_terrain_translate_up])
 			terrain
 			(
 				in_max_levels = 5,
 				in_width = 41,
-				in_z_delta = 6,
-				in_z_offset = 1.5,
+				in_z_delta = gz_terrain_roughness,
+				in_z_offset = gz_terrain_offset,
 				in_erosion=0
 			);
 			
@@ -749,13 +881,13 @@ module tile_grass_two_quarter_city_opposite
 				screw_depth=0
 			);
 			//On top, create a fractal terrain
-			translate([0,0,6])
+			translate([0,0,gz_terrain_translate_up])
 			terrain
 			(
 				in_max_levels = 5,
 				in_width = 41,
-				in_z_delta = 6,
-				in_z_offset = 1.5,
+				in_z_delta = gz_terrain_roughness,
+				in_z_offset = gz_terrain_offset,
 				in_erosion=0
 			);
 			
@@ -783,7 +915,7 @@ module tile_grass_two_quarter_city_opposite
 //	TILE CITY 3/4
 //---------------------------------------------------------------------------
 
-tile_grass_three_quarter_city_road(ib_herald=true,ib_road=true);
+//tile_grass_three_quarter_city_road(ib_herald=true,ib_road=true);
 
 //A grass tile with a road going straight through
 module tile_grass_three_quarter_city_road
@@ -812,13 +944,13 @@ module tile_grass_three_quarter_city_road
 				screw_depth=0
 			);
 			//On top, create a fractal terrain
-			translate([0,0,6])
+			translate([0,0,gz_terrain_translate_up])
 			terrain
 			(
 				in_max_levels = 5,
 				in_width = 41,
-				in_z_delta = 6,
-				in_z_offset = 1.5,
+				in_z_delta = gz_terrain_roughness,
+				in_z_offset = gz_terrain_offset,
 				in_erosion=0
 			);
 			
@@ -858,8 +990,65 @@ module tile_grass_three_quarter_city_road
 	}
 }
 
+
 //---------------------------------------------------------------------------
-//
+//	TILE CITY 4/4
+//---------------------------------------------------------------------------
+
+//tile_grass_four_quarter_city(ib_herald=true);
+
+module tile_grass_four_quarter_city
+(
+	ib_herald = false
+)
+{
+	n_z_wall_top_height = 20;
+	n_z_city_top_height = 16;
+	n_z_wall_height = 15;
+
+	difference()
+	{
+		union()
+		{
+			//Create a grifinity tile
+			grid_block
+			(
+				num_x=1,
+				num_y=1,
+				num_z=0.5,
+				magnet_diameter=0,
+				screw_depth=0
+			);
+			//On top, create a fractal terrain
+			translate([0,0,gz_terrain_translate_up])
+			terrain
+			(
+				in_max_levels = 5,
+				in_width = 41,
+				in_z_delta = gz_terrain_roughness,
+				in_z_offset = gz_terrain_offset,
+				in_erosion=0
+			);
+			
+			four_quarter_city_block
+			(
+				in_z_wall_height = n_z_wall_height,
+				in_z_wall_top_height = n_z_wall_top_height,
+				iz_plaza_top_height = n_z_city_top_height,
+				ib_herald = ib_herald
+			);
+
+		}
+		union()
+		{
+			//Drill the city block
+			pin(-0.8, -0.0,in_z_top = n_z_wall_top_height+4, in_z_drill = 14);
+		}
+	}
+}
+
+//---------------------------------------------------------------------------
+//	GENERATE PRINTABLE GRID WITH A MIX OF TILES
 //---------------------------------------------------------------------------
 
 module grid_of_tiles_big_city
@@ -868,16 +1057,20 @@ module grid_of_tiles_big_city
 	in_cols = 1,
 	spacing = 42,
 	//Two Quarter City with NO Herald
-	in_two_quarter_city = 1,
-	in_two_quarter_city_with_herald = 1,
-	in_two_quarter_city_with_road_turn = 1,
-	in_two_quarter_city_with_road_turn_with_herald = 1,
-	in_two_quarter_city_opposite = 1,
-	in_two_quarter_city_opposite_with_herald = 1,
-	in_three_quarter_city = 1,
-	in_three_quarter_city_with_herald = 1,
-	in_three_quarter_city_with_road = 1,
-	in_three_quarter_city_with_road_and_herald = 1
+	in_two_quarter_city = 3,
+	in_two_quarter_city_with_herald = 2,
+	in_two_quarter_city_with_road_turn = 3,
+	in_two_quarter_city_with_road_turn_with_herald = 2,
+	in_two_quarter_city_opposite = 2,
+	in_two_quarter_city_opposite_with_herald = 2,
+	// 3/4
+	in_three_quarter_city = 3,
+	in_three_quarter_city_with_herald = 2,
+	in_three_quarter_city_with_road = 2,
+	in_three_quarter_city_with_road_and_herald = 2,
+	// 4/4
+	in_four_quarter_city = 1,
+	in_four_quarter_city_with_herald = 1
 )
 {
     for (x = [0:in_cols-1])
@@ -989,7 +1182,43 @@ module grid_of_tiles_big_city
 		{
 			tile_grass_three_quarter_city_road(ib_herald=true, ib_road=true);
 		}
-
+		else if
+		(
+			n <
+			in_two_quarter_city+
+			in_two_quarter_city_with_herald+
+			in_two_quarter_city_with_road_turn+
+			in_two_quarter_city_with_road_turn_with_herald+
+			in_two_quarter_city_opposite+
+			in_two_quarter_city_opposite_with_herald+
+			in_three_quarter_city +
+			in_three_quarter_city_with_herald +
+			in_three_quarter_city_with_road +
+			in_three_quarter_city_with_road_and_herald +
+			in_four_quarter_city
+		)
+		{
+			tile_grass_four_quarter_city(ib_herald=true);
+		}
+		else if
+		(
+			n <
+			in_two_quarter_city+
+			in_two_quarter_city_with_herald+
+			in_two_quarter_city_with_road_turn+
+			in_two_quarter_city_with_road_turn_with_herald+
+			in_two_quarter_city_opposite+
+			in_two_quarter_city_opposite_with_herald+
+			in_three_quarter_city +
+			in_three_quarter_city_with_herald +
+			in_three_quarter_city_with_road +
+			in_three_quarter_city_with_road_and_herald +
+			in_four_quarter_city +
+			in_four_quarter_city_with_herald
+		)
+		{
+			tile_grass_four_quarter_city(ib_herald=true);
+		}
 
 		else
 		{
@@ -1035,4 +1264,4 @@ if (false)
 
 //tile_grass_two_quarter_city_opposite(true);
 
-//grid_of_tiles_big_city(4,4);
+grid_of_tiles_big_city(5,5);
