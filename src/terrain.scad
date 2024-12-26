@@ -20,7 +20,7 @@ created roundbevels to make rounded corners
 */
 
 // ========== customizable parameters ==========
-
+/*
 // maximum subdivision levels (max 8)
 maxlevels = 5;  // [0:8]
 // Number of facets generated is 2 * (2^maxlevels + 1)^2.
@@ -66,67 +66,115 @@ cornerbevel = 3; // [0:20]
 // corner elevations; suggested range -1 to +1
 cornerelev = [[0, 0], [+0, 0]];
 // This is the starting cell for the fractal landscape generation. Regardless of the number of subdivisions, the corners of the landscape always have the values specified here.
-
+*/
 // ========== end of customizable parameters ==========
 
 module dummy(){}    // force customizer to stop here if it's active
 
 
-module terrain_seed( in_seed = -1000, in_max_levels = 4, in_width = 100, in_z_delta = 20, in_z_offset = 0, in_erosion = 0 )
+if (true)
 {
-	randfield = scaled2drands(in_seed, cornerelev, in_max_levels);
-
-	// now make the landscape
-	landscape = make_landscape(cornerelev, in_max_levels, randfield);
-
-	// erode the landscape (happens if erosionpasses > 0)
-	plotfield = grayerode(landscape, passes=in_erosion);
-
-	translate([0,0,2.5]) 
-    difference()
-	{
-        surfaceplot(plotfield, xlen=in_width, ylen=in_width, zoffset=in_z_offset, zscale=in_z_delta, box=boxed);
-		roundbevels(cornerbevel, in_width, in_width, 4*in_z_delta, -2*in_z_delta-in_z_offset);
-    }
+terrain
+(
+	in_max_levels = 4,
+	in_width = 100,
+	iz_min_surface_height = 2,
+	iz_max_surface_height = 22,
+	in_erosion = 0
+);
 }
 
-
-module terrain( in_max_levels = 4, in_width = 100, in_z_delta = 20, in_z_offset = 0, in_erosion = 0 )
+module terrain
+(
+	in_max_levels = 4,
+	in_width = 100,
+	iz_min_surface_height = 0,
+	iz_max_surface_height = 20,
+	in_erosion = 0,
+	ib_boxed = true,
+	ir_corner_rounding = 3
+)
 {
-	n_seed = rands( -1000, 1000, 1 );
-	
-	randfield = scaled2drands(n_seed[0], cornerelev, in_max_levels);
+	cornerelev = [[0, 0], [+0, 0]];
 
-	// now make the landscape
-	landscape = make_landscape(cornerelev, in_max_levels, randfield);
-
-	// erode the landscape (happens if erosionpasses > 0)
-	plotfield = grayerode(landscape, passes=in_erosion);
-
-	 renderlandscape
+	randfield = scaled2drands
 	(
-		plotfield,
-		sealevel,
-		sidelen,
-		zoffset,
-		zscale,
-		boxed,
-		cornerbevel
+		cornerelev,
+		in_max_levels
 	);
-	/*
-	translate([0,0,0]) 
+
+	//recursive function that recursively subdivide the field
+	landscape = make_landscape
+	(
+		cornerelev,
+		in_max_levels,
+		randfield
+	);
+
+	// erode the landscape (happens if erosionpasses > 0)
+	plotfield = grayerode
+	(
+		landscape,
+		passes=in_erosion
+	);
+
     difference()
 	{
-        surfaceplot(plotfield, xlen=in_width, ylen=in_width, zoffset=in_z_offset, zscale=in_z_delta, box=boxed);
-		roundbevels(cornerbevel, in_width, in_width, 4*in_z_delta, -2*in_z_delta-in_z_offset);
+        surfaceplot
+		(
+			plotfield,
+			xlen=in_width,
+			ylen=in_width,
+			iz_min_surface_height=iz_min_surface_height,
+			iz_max_surface_height=iz_max_surface_height,
+			box=true
+		);
+		roundbevels
+		(
+			ir_corner_rounding,
+			in_width,
+			in_width,
+			4*iz_max_surface_height,
+			-2*iz_max_surface_height-iz_min_surface_height
+		);
     }
-	*/
 }
 
-module hill( in_seed = -1000, in_max_levels = 4, in_width = 100, in_z_delta = 20, in_z_offset = 0, in_erosion = 0, in_z_random = 5 )
+if (false)
 {
+	hill
+	(
+		in_max_levels = 4,
+		in_width = 100,
+		in_z_delta = 30,
+		in_z_offset = 20,
+		in_erosion = 0,
+		in_z_random = 5,
+		ir_corner_rounding = 3
+	);
+}
+module hill
+(
+	in_max_levels = 4,
+	in_width = 100,
+	//Maximum variation of the terrain
+	in_z_delta = 20,
+	//minimum height of the terrain
+	in_z_offset = 0,
+	in_erosion = 0,
+	in_z_random = 5,
+	ir_corner_rounding = 3
+)
+{
+	cornerelev = [[0, 0], [+0, 0]];
 
-	linear_plane = generate_square_2d_array(in_max_levels,in_z_top=in_z_delta,in_z_random=in_z_random);
+	linear_plane =
+		generate_square_2d_array
+		(
+			in_max_levels,
+			in_z_top=in_z_delta,
+			in_z_random=in_z_random
+		);
 
 	// now make the landscape
 	//landscape = make_landscape(cornerelev, in_max_levels, randfield);
@@ -135,13 +183,29 @@ module hill( in_seed = -1000, in_max_levels = 4, in_width = 100, in_z_delta = 20
 	// erode the landscape (happens if erosionpasses > 0)
 	plotfield = grayerode(landscape, passes=in_erosion);
 
-	translate([0,0,2.5]) 
     difference()
 	{
-        surfaceplot(plotfield, xlen=in_width, ylen=in_width, zoffset=in_z_offset, zscale=in_z_delta, box=boxed);
-		roundbevels(cornerbevel, in_width, in_width, 4*in_z_delta, -2*in_z_delta-in_z_offset);
+        surfaceplot
+		(
+			plotfield,
+			xlen=in_width,
+			ylen=in_width,
+			iz_min_surface_height=in_z_offset,
+			iz_max_surface_height=in_z_delta,
+			box=true
+		);
+		roundbevels
+		(
+			ir_corner_rounding,
+			in_width,
+			in_width,
+			4*in_z_delta,
+			-2*in_z_delta-in_z_offset
+		);
     }
 }
+
+// ========== AUXILIARY FUNCTIONS ==========
 
 function generate_square_2d_array(in_level=2, in_z_top=0,in_z_random=1) =
 	//HACK: the generation has the Z wonky, i divide by 10 to refactor
@@ -166,95 +230,52 @@ function interpolate(x, y, size, Ztarget) =
     )
     Ztarget * (d);
 
-//terrain( in_max_levels = 2, in_z_delta = 10);
-//hill( in_max_levels = 3, in_z_delta = 15, in_erosion=1);
-
-/*
-
-// first, generate a field of random elevation offsets at each coordinate
-randfield = scaled2drands(seed, cornerelev, maxlevels);
-
-// now make the landscape
-landscape = make_landscape(cornerelev, maxlevels, randfield);
-
-// erode the landscape (happens if erosionpasses > 0)
-plotfield = grayerode(landscape, passes=erosionpasses);
-
-// render the landscape, sea, or both (normally "both" is most useful)
-
-
-
-if (show == "terrain") {
-    difference() {
-        surfaceplot(plotfield, xlen=sidelen, ylen=sidelen, zoffset=zoffset, zscale=zscale, box=boxed);
-        if (boxed && cornerbevel > 0)
-            //cornerbevels(cornerbevel, sidelen, sidelen, 4*zscale, -2*zscale-zoffset);
-			roundbevels(cornerbevel, sidelen, sidelen, 4*zscale, -2*zscale-zoffset);
-    }
-} else if (show == "sea") { // makes sense only if boxed==true
-    difference()
-	{
-        seabox
-		(
-			plotfield,
-			sealevel,
-			sidelen,
-			zoffset,
-			zscale,
-			cornerbevel
-		);
-		surfaceplot
-		(
-			plotfield,
-			xlen=sidelen,
-			ylen=sidelen,
-			zoffset=zoffset,
-			zscale=zscale,
-			box=true
-		);
-    }
-} else // both land and sea together
-    renderlandscape
-	(
-		plotfield,
-		sealevel,
-		sidelen,
-		zoffset,
-		zscale,
-		boxed,
-		cornerbevel
-	);
-
-*/
 
 // ========== rendering modules ==========
 
 // landscape + sea
 
-module renderlandscape(elevations, sealevel=0, sidelen=100, zoffset=0, zscale=30, box=false, bevel=0) {
-    difference() {
-        union() {
-            surfaceplot(elevations, sidelen, sidelen, zoffset, zscale, box);
-            seabox(elevations, sealevel, sidelen, zoffset, zscale, 0);
-        }
-        if (bevel > 0)
-            cornerbevels(bevel, sidelen, sidelen, 4*zscale, -2*zscale-zoffset);
-    }
+module renderlandscape
+(
+	elevations,
+	sealevel=0,
+	iw_side=100,
+	iz_offset=0,
+	iz_delta=30,
+	ib_boxed=false,
+	ir_corner_rounding = 0
+)
+{
+	difference()
+	{
+		union()
+		{
+			surfaceplot
+			(
+				elevations,
+				iw_side,
+				iw_side,
+				iz_offset,
+				iz_delta,
+				ib_boxed
+			);
+			seabox
+			(
+				elevations,
+				sealevel,
+				iw_side,
+				iz_offset,
+				iz_delta,
+				0
+			);
+		}
+		if (ir_corner_rounding > 0)
+		{
+			cornerbevels(ir_corner_rounding, iw_side, iw_side, 4*iz_delta, -2*iz_delta-iz_offset);
+		}
+	}
 }
 
-// sea only
-
-module seabox(elevations, sealevel=0, sidelen=100, zoffset=0, zscale=30, bevel=0) {
-    zmin = min2d(elevations);
-    zmax = max2d(elevations);
-    zpmin = zmin*zscale+zoffset;
-    ht = (sealevel-zmin*zscale)+0.01;
-    if (ht>0)
-        translate([0,0,zpmin+0.5*ht]) difference() {
-            color("blue") cube([sidelen-0.01, sidelen-0.01, ht], true);
-            if (bevel > 0) cornerbevels(bevel, sidelen, sidelen, (zmax-zmin)*zscale, zmin*zscale);
-        }
-}
 
 // corner bevels
 
@@ -301,29 +322,62 @@ module roundbevels(bevel, xsidelen, ysidelen, zht, zmin)
 			}
 
 		}
-
 	}
-}
-
-// Submodule to create the rounded corner "bevel" (rounded square)
-module square_bevel(radius) {
-    offset = radius;
-    square(40, center = true); 
-    circle(radius);
 }
 
 
 // general purpose module for plotting an 2D array of elevation values
 
-module surfaceplot(elevations, xlen=100, ylen=100, zoffset=0, zscale=30, box=false) {
-    echo("Generating 3D plot");
+module surfaceplot
+(
+	elevations,
+	xlen=100,
+	ylen=100,
+	//Min and Max extent of the random surface
+	iz_min_surface_height=0,
+	iz_max_surface_height=30,
+	//Roll a percentage of the difference between MIN and MAX to make the height random. 1.0 means it will always be MAX height the tallest point. Lower than 1 will make the maximum height roll randomly
+	in_height_roll = 0.2,
+	box=true
+)
+{
+	//This uses a polyhedron
+	//It defines a list of points
+	//it defines a list of indexes of points into faces to render
+	//box add four points and five faces
+	//I want to change the behaviour of BOX
+	//I want to create a solid foundation for the random terrain that is fixed height
+	//offset should make the foundation at 0, and move UP the procedural terrain
+	//so that the min is OFFSET above the base
+
+    echo("Generating 3D plot. Zmax: ", iz_max_surface_height, "Zoffset: ",iz_min_surface_height);
     xrange = [-xlen/2, xlen/2];
     yrange = [-ylen/2, ylen/2];
     irange = len(elevations[0]);
     xrangestep = (xrange[1]-xrange[0]) / (irange-1);
     yrangestep = (yrange[1]-yrange[0]) / (irange-1);
-    zmin = min2d(elevations)*zscale+zoffset-1;
-    zboff = max(0, zoffset);
+
+	//compute the minimum Z of the surface
+    zmin = min2d(elevations);
+	zmax = max2d(elevations);
+	echo("IN Zmin: ", zmin, "Zmax: ", zmax);
+
+	//I want to normalize the surface so that
+	//	minimum is offset
+	//	maximum is offset to scale
+	//but I also want the maximum to be an hint?
+	//Should I go from a percentage of scale to scale?
+	
+	//Roll the maximum of the field from 20% to 100%
+	oz_max_random = rands(in_height_roll,1.0,1)[0] *(iz_max_surface_height-iz_min_surface_height)+iz_min_surface_height;
+	echo("Zmax randomized", oz_max_random);
+	//Compute the offset and gain to convert the surface into an elevation field
+	n_gain = (oz_max_random-iz_min_surface_height)/(zmax -zmin);
+	//n_gain = (iz_max_surface_height-iz_min_surface_height)/(zmax -zmin);
+	
+	//The bottom of the box is 0, the surface builds up from that
+	z_box_bottom = 0;
+	//Construct all the points of the poly
     field3d =
 	[
         for(y=[0:irange-1])
@@ -331,13 +385,15 @@ module surfaceplot(elevations, xlen=100, ylen=100, zoffset=0, zscale=30, box=fal
 				[
 					x*xrangestep+xrange[0],
 					y*yrangestep+yrange[0],
-					elevations[y][x]*zscale+zoffset
+					//elevations[y][x]*iz_max_surface_height+zoffset-zmin
+					(elevations[y][x]-zmin)*n_gain+iz_min_surface_height
 				],
-        if (box) [xrange[0], yrange[0], zmin-zboff],
-        if (box) [xrange[0], yrange[1], zmin-zboff],
-        if (box) [xrange[1], yrange[0], zmin-zboff],
-        if (box) [xrange[1], yrange[1], zmin-zboff]
+        if (box) [xrange[0], yrange[0], z_box_bottom],
+        if (box) [xrange[0], yrange[1], z_box_bottom],
+        if (box) [xrange[1], yrange[0], z_box_bottom],
+        if (box) [xrange[1], yrange[1], z_box_bottom]
     ];
+	//Links the points into faces
     npts = irange*irange;
     faces = [
         for(y=[0:irange-2]) let(jy=irange*y)
@@ -349,14 +405,46 @@ module surfaceplot(elevations, xlen=100, ylen=100, zoffset=0, zscale=30, box=fal
         if (box) [ npts+1, npts+3, for(x=[0:irange-1]) npts-1-x ],
         if (box) [ npts, npts+2, npts+3, npts+1 ]
     ];
+
+	//echo("Field", field3d);
+	//echo("Faces", faces);
     polyhedron(field3d, faces, convexity=10);
 }
 
 // ========== functions ==========
 
-function make_landscape(field, levels, randfield, lv=0) =
-    let(q = echo("Fractal landscape subdivision level", lv, "of", levels) 1)
-    lv >= levels ? field : let(newfield = subdivide_field(field, randfield)) make_landscape(newfield, levels, randfield, lv+1);
+function make_landscape
+(
+	field,
+	in_lv_target,
+	randfield,
+	in_lv=0
+) =
+    let
+	(
+		q = echo("Fractal landscape subdivision level", in_lv, "of", in_lv_target)
+	)
+	//Current level reaches the target level?
+    in_lv >= in_lv_target ?
+		//YES, return the result
+		field :
+		//NO, recursively subdivide
+		let
+		(
+			newfield =
+				subdivide_field
+				(
+					field,
+					randfield
+				)
+		)
+		make_landscape
+		(
+			newfield,
+			in_lv_target,
+			randfield,
+			in_lv+1
+		);
 
 function subdivide_field(a, randfield) = let(
     r0len = len(a[0]), r1len = 2*r0len-1, randrowlen = len(randfield[0]),
@@ -400,39 +488,65 @@ function subdivide_oddrow(lastrow, nextrow, randrownums) = let(
 // Returns:
 // A 2D array of random numbers scaled by coordinates.
 
-function scaled2drands(seed, cornervals, levels, leftedge=undef, rightedge=undef, topedge=undef, botedge=undef) = let(
+function scaled2drands
+(
+	cornervals,
+	in_level,
+	leftedge=undef,
+	rightedge=undef,
+	topedge=undef,
+	botedge=undef
+) = 
+let
+(
     // Log the generation process
-    q = echo("Generating random number field") 1,
+    q = echo("Generating random number field"),
 
     // Compute the number of subdivisions based on levels
-    imax = pow(2, levels),
+    n_level_total = pow(2, in_level),
 
     // Generate or use predefined edge values
-    eleft = leftedge == undef ? randline(seed, levels, cornervals[0][0], cornervals[1][0]) : leftedge,
-    eright = rightedge == undef ? randline(seed + 7, levels, cornervals[0][1], cornervals[1][1]) : rightedge
-) [
+    eleft = leftedge == undef ? randline(in_level, cornervals[0][0], cornervals[1][0]) : leftedge,
+    eright = rightedge == undef ? randline(in_level, cornervals[0][1], cornervals[1][1]) : rightedge
+)
+[
     // Generate top edge values if not provided
-    topedge == undef ? randline(seed, levels, cornervals[0][0], cornervals[0][1]) : topedge,
+    topedge == undef ? randline(in_level, cornervals[0][0], cornervals[0][1]) : topedge,
 
     // Generate random values for the field, row by row
-    for (i = [1 : imax - 1])
-        randline(seed + 17 * i, levels, eleft[i], eright[i], baselevel = numlevel(i, levels)),
+    for (i = [1 : n_level_total - 1])
+        randline(in_level, eleft[i], eright[i], baselevel = numlevel(i, in_level)),
 
     // Generate bottom edge values if not provided
-    botedge == undef ? randline(seed, levels, cornervals[1][0], cornervals[1][1]) : botedge
+    botedge == undef ? randline(in_level, cornervals[1][0], cornervals[1][1]) : botedge
 ];
 
 // line of random numbers scaled according to index
 
-function randline(in_seed, levels, firstval=undef, lastval=undef, baselevel=0, randrange=2) = let(
+function randline
+(
+	levels,
+	firstval=undef,
+	lastval=undef,
+	baselevel=0,
+	randrange=2
+) =
+let
+(
     n = pow(2, levels),
-	nr = rands(-0.5*randrange,0.5*randrange, n+1, in_seed),
+	nr = rands(-0.5*randrange,0.5*randrange, n+1),
     endscl = pow(0.5, baselevel)
-    ) [ firstval == undef ? endscl*nr[0] : firstval,
-        for(i=[1:n-1]) let(ilev = max(baselevel, numlevel(i, levels)))
-            pow(0.5,ilev) * nr[i],
+)
+[
+	firstval == undef ? endscl*nr[0] : firstval,
+	for(i=[1:n-1])
+		let
+		(
+			ilev = max(baselevel, numlevel(i, levels))
+		)
+        pow(0.5,ilev) * nr[i],
         lastval == undef ? endscl*nr[n] : lastval
-    ];
+];
         
 // subdivision level of a number given 'levels'
 
@@ -443,9 +557,12 @@ function numlevel(num, levels, testnum=0, step=0, lv=0) = let(
 
 // minimum and maximum of a 2d array
 
-function min2d(field) = let(
-    rowmins = [ for(y=[0:len(field)-1]) min(field[y]) ]
-    ) min(rowmins);
+function min2d(field) =
+	let
+	(
+		rowmins = [ for(y=[0:len(field)-1]) min(field[y]) ]
+    )
+	min(rowmins);
 
 function max2d(field) = let(
     rowmaxes = [ for(y=[0:len(field)-1]) max(field[y]) ]
