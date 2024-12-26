@@ -1,7 +1,6 @@
-include <tile_constants.scad>
-
+//Credits to 2022 Jamie MIT License <vector76@gmail.com>
+//Repo: https://github.com/vector76/gridfinity_openscad
 include <gridfinity_modules.scad>
-
 
 //Credits to
 //https://www.printables.com/@Anachronist
@@ -9,11 +8,10 @@ include <gridfinity_modules.scad>
 //Heavily modified to make boxes of consistent height and roll on maximum height instead of scaling factors
 include <terrain.scad>
 
-module tile_grass
-(
-	iz_minimum_height = 2.5,
-	iz_maximum_height = 7
-)
+//Tile Constants
+include <tile_constants.scad>
+
+module tile_grass()
 {
 
 	union()
@@ -33,10 +31,10 @@ module tile_grass
 		(
 			in_max_levels = 4,
 			in_width = gw_gridfinity,
-			iz_min_surface_height = iz_minimum_height,
-			iz_max_surface_height = iz_maximum_height,
+			iz_min_surface_height = gz_grass_base,
+			iz_max_surface_height = gz_grass_flat,
 			//I want grass to have very consistent max height
-			in_height_roll = 0.9,
+			in_height_roll = gn_grass_flat_consistency,
 			in_erosion = 1
 		);
 	}

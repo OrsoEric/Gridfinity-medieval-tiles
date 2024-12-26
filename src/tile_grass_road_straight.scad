@@ -1,12 +1,14 @@
+//Credits to 2022 Jamie MIT License <vector76@gmail.com>
+//Repo: https://github.com/vector76/gridfinity_openscad
 include <gridfinity_modules.scad>
-
 
 //Credits to
 //https://www.printables.com/@Anachronist
 //https://www.printables.com/model/129126-procedural-weathered-fractal-terrain-in-openscad/files
 include <terrain.scad>
 
-n_gridfinity_half_pitch = 41/2;
+//Tile Constants
+include <tile_constants.scad>
 
 //Define the weavy bars I use as roads
 include <road.scad>
@@ -14,175 +16,198 @@ include <road.scad>
 //Pin
 include <building.scad>
 
-//A grass tile with a road going straight through
-module tile_grass_road(in_seed)
+//------------------------------------------------------------------------------
+//	GRASS TILE + STRAIGHT ROAD
+//------------------------------------------------------------------------------
+
+//tile_grass_road_straight();
+//tile_grass_road_straight(4);
+
+module tile_grass_road_straight
+(
+	//Nimber of quarters that are roads (2,3,4)
+	in_roads = 2
+)
 {
-	//the road reaches up to this height
-	n_z_road_top_height = 14;
-	//the road digs inside the model by this height
-	n_z_road_thickness = 7;
-	n_z_road_indent = 1;
-
-	n_w_road_width = 7;
-	
-
 	difference()
 	{
 		union()
 		{
-			//Create a grifinity tile
-			grid_block(num_x=1, num_y=1, num_z=0.5, magnet_diameter=0, screw_depth=0);
-			//On top, create a fractal terrain
-			translate([0,0,6])
-			terrain(in_max_levels = 5, in_width = 41, in_z_delta = 4, in_z_offset = 1);
+			//Instance a gridfinity base tile
+			grid_block
+			(
+				num_x=1,
+				num_y=1,
+				num_z=0.5,
+				magnet_diameter=0,
+				screw_depth=0
+			);
+			//Instance fractal terrain
+			translate([0,0,gz_gridfinity_socket_offset])
+			terrain
+			(
+				in_max_levels = 4,
+				in_width = gw_gridfinity,
+				iz_min_surface_height = gz_grass_base,
+				iz_max_surface_height = gz_grass_flat,
+				//I want grass to have very consistent max height
+				in_height_roll = gn_grass_flat_consistency,
+				in_erosion = 1
+			);
+
 			//on top create a weavy road
-			translate([0,0,n_z_road_top_height-n_z_road_thickness])
-			bar_sin(41, n_w_road_width,n_z_road_thickness, 1, 2);
+			translate([0,0,gz_road_top_height-gz_road_height])
+			bar_sin
+			(
+				in_l = gw_gridfinity,
+				in_w = gw_road_width,
+				in_z = gz_road_height,
+				in_w_amplitude = 1,
+				in_frequency = 2
+			);
+			if (in_roads == 3)
+			{
+				rotate([0,0,90])
+				translate([gw_gridfinity/4,0,gz_road_top_height-gz_road_height])
+				bar_sin
+				(
+					in_l = gw_gridfinity/2,
+					in_w = gw_road_width,
+					in_z = gz_road_height,
+					in_w_amplitude = -1,
+					in_frequency = 1
+				);
+			}
+			else if (in_roads == 4)
+			{
+				rotate([0,0,90])
+				translate([0,0,gz_road_top_height-gz_road_height])
+				bar_sin
+				(
+					in_l = gw_gridfinity,
+					in_w = gw_road_width,
+					in_z = gz_road_height,
+					in_w_amplitude = 1,
+					in_frequency = 2
+				);
+			}
 		}
 		union()
 		{
-			//on top create a weavy road to extrude and create the sides of the road
-			translate([0,0,n_z_road_top_height-n_z_road_indent])
-			bar_sin(41, n_w_road_width-2, n_z_road_indent, 1, 2);
-			//Drill a number of holes to let meeple slot in
-			//Drill a hole for the road
-			translate([-0.8*n_gridfinity_half_pitch,0,n_z_road_top_height-n_z_road_thickness])
-			linear_extrude(n_z_road_thickness)
-			circle(d=2.5+0.3, $fs=0.1);
-			//Drill hole for the Y+ grass field
-			translate([-0.0*n_gridfinity_half_pitch,+0.6*n_gridfinity_half_pitch,n_z_road_top_height-n_z_road_thickness])
-			linear_extrude(n_z_road_thickness)
-			circle(d=2.5+0.3, $fs=0.1);
-			//Drill hole for the Y- grass field
-			translate([-0.0*n_gridfinity_half_pitch,-0.6*n_gridfinity_half_pitch,n_z_road_top_height-n_z_road_thickness])
-			linear_extrude(n_z_road_thickness)
-			circle(d=2.5+0.3, $fs=0.1);
-		}
+			translate([0,0,gz_road_top_height-gz_road_indent])
+			bar_sin
+			(
+				in_l = gw_gridfinity,
+				in_w = gw_road_width-gw_road_indent,
+				in_z = gw_road_indent,
+				in_w_amplitude = 1,
+				in_frequency = 2
+			);
+			if (in_roads == 3)
+			{
+				rotate([0,0,90])
+				translate([gw_gridfinity/4,0,gz_road_top_height-gz_road_indent])
+				bar_sin
+				(
+					in_l = gw_gridfinity/2,
+					in_w = gw_road_width-gw_road_indent,
+					in_z = gw_road_indent,
+					in_w_amplitude = -1,
+					in_frequency = 1
+				);
+			}
+			//if it's a four way crossroad
+			else if (in_roads == 4)
+			{
+				rotate([0,0,90])
+				translate([0,0,gz_road_top_height-gz_road_indent])
+				bar_sin
+				(
+					in_l = gw_gridfinity,
+					in_w = gw_road_width-gw_road_indent,
+					in_z = gw_road_indent,
+					in_w_amplitude = 1,
+					in_frequency = 2
+				);
+			}
 
+			if (in_roads >= 2)
+			{
+				//Drill a hole for the EAST road 
+				pin
+				(
+					in_x = +0.8 *gw_gridfinity_half_pitch,
+					in_y = -0.05 *gw_gridfinity_half_pitch,
+					in_z_top = gz_road_top_height,
+					in_z_drill = 10
+				);
+				//Drill a hole for the SOUTH-EAST field 
+				pin
+				(
+					in_x = +0.6 *gw_gridfinity_half_pitch,
+					in_y = -0.6 *gw_gridfinity_half_pitch,
+					in_z_top = gz_grass_top_height,
+					in_z_drill = 8
+				);
+				//Drill a hole for the WEST road 
+				pin
+				(
+					in_x = -0.8 *gw_gridfinity_half_pitch,
+					in_y = +0.05 *gw_gridfinity_half_pitch,
+					in_z_top = gz_road_top_height,
+					in_z_drill = 10
+				);
+				//Drill a hole for the NORTH-WEST field 
+				pin
+				(
+					in_x = -0.6 *gw_gridfinity_half_pitch,
+					in_y = +0.6 *gw_gridfinity_half_pitch,
+					in_z_top = gz_grass_top_height,
+					in_z_drill = 8
+				);
+
+			}
+			if (in_roads >= 3)
+			{
+				//Drill a hole for the NORTH road 
+				pin
+				(
+					in_x = +0.05 *gw_gridfinity_half_pitch,
+					in_y = +0.8 *gw_gridfinity_half_pitch,
+					in_z_top = gz_road_top_height,
+					in_z_drill = 10
+				);
+				//Drill a hole for the NORTH-EAST field 
+				pin
+				(
+					in_x = +0.6 *gw_gridfinity_half_pitch,
+					in_y = +0.6 *gw_gridfinity_half_pitch,
+					in_z_top = gz_grass_top_height,
+					in_z_drill = 8
+				);
+			}
+			if (in_roads >= 4)
+			{
+				//Drill a hole for the SOUTH road 
+				pin
+				(
+					in_x = -0.05 *gw_gridfinity_half_pitch,
+					in_y = -0.8 *gw_gridfinity_half_pitch,
+					in_z_top = gz_road_top_height,
+					in_z_drill = 10
+				);
+				//Drill a hole for the SOUTH-WEST field 
+				pin
+				(
+					in_x = -0.6 *gw_gridfinity_half_pitch,
+					in_y = -0.6 *gw_gridfinity_half_pitch,
+					in_z_top = gz_grass_top_height,
+					in_z_drill = 8
+				);
+			}	
+		}
 	}
 }
-
-//A grass tile with a road going straight through
-module tile_grass_crossroad_four_way(in_seed)
-{
-	//the road reaches up to this height
-	n_z_road_top_height = 14;
-	//the road digs inside the model by this height
-	n_z_road_thickness = 7;
-	n_z_road_indent = 1;
-
-	n_w_road_width = 7;
-	
-
-	difference()
-	{
-		union()
-		{
-			//Create a grifinity tile
-			grid_block(num_x=1, num_y=1, num_z=0.5, magnet_diameter=0, screw_depth=0);
-			//On top, create a fractal terrain
-			translate([0,0,6])
-			terrain(in_max_levels = 5, in_width = 41, in_z_delta = 4, in_z_offset = 1);
-			//on top create a weavy road
-			
-			translate([0,0,n_z_road_top_height-n_z_road_thickness])
-			bar_sin(41, n_w_road_width,n_z_road_thickness, 1, 2);
-			rotate([0,0,90])
-			translate([0,0,n_z_road_top_height-n_z_road_thickness])
-			bar_sin(41, n_w_road_width,n_z_road_thickness, 1, 2);
-		}
-		union()
-		{
-			//on top create a weavy road to extrude and create the sides of the road
-			translate([0,0,n_z_road_top_height-n_z_road_indent])
-			bar_sin(41, n_w_road_width-2, n_z_road_indent, 1, 2);
-			rotate([0,0,90])
-			translate([0,0,n_z_road_top_height-n_z_road_indent])
-			bar_sin(41, n_w_road_width-2, n_z_road_indent, 1, 2);
-			
-			//Drill a hole for each of the four road
-			translate([-0.8*n_gridfinity_half_pitch,+0.05*n_gridfinity_half_pitch,n_z_road_top_height-n_z_road_thickness])
-			linear_extrude(n_z_road_thickness)
-			circle(d=2.5+0.3, $fs=0.1);
-			translate([+0.8*n_gridfinity_half_pitch,-0.05*n_gridfinity_half_pitch,n_z_road_top_height-n_z_road_thickness])
-			linear_extrude(n_z_road_thickness)
-			circle(d=2.5+0.3, $fs=0.1);
-			translate([-0.05*n_gridfinity_half_pitch,-0.8*n_gridfinity_half_pitch,n_z_road_top_height-n_z_road_thickness])
-			linear_extrude(n_z_road_thickness)
-			circle(d=2.5+0.3, $fs=0.1);
-translate([+0.05*n_gridfinity_half_pitch,+0.8*n_gridfinity_half_pitch,n_z_road_top_height-n_z_road_thickness])
-			linear_extrude(n_z_road_thickness)
-			circle(d=2.5+0.3, $fs=0.1);
-
-			//Drill a hole for each of the four fields
-			translate([-0.6*n_gridfinity_half_pitch,-0.6*n_gridfinity_half_pitch,n_z_road_top_height-n_z_road_thickness])
-			linear_extrude(n_z_road_thickness)
-			circle(d=2.5+0.3, $fs=0.1);
-translate([-0.6*n_gridfinity_half_pitch,+0.6*n_gridfinity_half_pitch,n_z_road_top_height-n_z_road_thickness])
-			linear_extrude(n_z_road_thickness)
-			circle(d=2.5+0.3, $fs=0.1);
-translate([+0.6*n_gridfinity_half_pitch,-0.6*n_gridfinity_half_pitch,n_z_road_top_height-n_z_road_thickness])
-			linear_extrude(n_z_road_thickness)
-			circle(d=2.5+0.3, $fs=0.1);
-translate([+0.6*n_gridfinity_half_pitch,+0.6*n_gridfinity_half_pitch,n_z_road_top_height-n_z_road_thickness])
-			linear_extrude(n_z_road_thickness)
-			circle(d=2.5+0.3, $fs=0.1);
-
-
-		}
-
-	}
-}
-
-//A grass tile with a road going straight through
-module tile_grass_crossroad_three_way(in_seed)
-{
-	//the road reaches up to this height
-	n_z_road_top_height = 14;
-	//the road digs inside the model by this height
-	n_z_road_thickness = 7;
-	n_z_road_indent = 1;
-
-	n_w_road_width = 7;
-	
-
-	difference()
-	{
-		union()
-		{
-			//Create a grifinity tile
-			grid_block(num_x=1, num_y=1, num_z=0.5, magnet_diameter=0, screw_depth=0);
-			//On top, create a fractal terrain
-			translate([0,0,6])
-			terrain(in_max_levels = 5, in_width = 41, in_z_delta = 4, in_z_offset = 1);
-			//on top create a weavy road
-			translate([-41/4,0,n_z_road_top_height-n_z_road_thickness])
-			bar_sin(41/2, n_w_road_width,n_z_road_thickness, 1, 1);
-			rotate([0,0,90])
-			translate([0,0,n_z_road_top_height-n_z_road_thickness])
-			bar_sin(41, n_w_road_width,n_z_road_thickness, 1, 2);
-		}
-		union()
-		{
-			//on top create a weavy road to extrude and create the sides of the road
-			translate([-41/4,0,n_z_road_top_height-n_z_road_indent])
-			bar_sin(41/2, n_w_road_width-2, n_z_road_indent, 1, 1);
-			rotate([0,0,90])
-			translate([0,0,n_z_road_top_height-n_z_road_indent])
-			bar_sin(41, n_w_road_width-2, n_z_road_indent, 1, 2);
-			
-			//Drill a hole for each of the three roads
-			pin(-0.8, -0.05);
-			pin(-0.05, -0.8);
-			pin(+0.05, +0.8);
-			//Drill the grassland
-			pin(-0.6, -0.6);
-			pin(-0.6, +0.6);
-			pin(+0.6, +0.0);
-		}
-	}
-}
-
 
 module grid_of_tiles(in_rows, in_cols, spacing, in_seed_start)
 {
@@ -190,37 +215,52 @@ module grid_of_tiles(in_rows, in_cols, spacing, in_seed_start)
     for (y = [0:in_rows-1])
     {
         translate([x * spacing, y * spacing, 0])
-            tile_grass_road(in_seed = in_seed_start+y*in_cols+x); // Random seed
+            tile_grass_road();
     }
 }
 
-module grid_of_tiles_four_ways(in_rows, in_cols, spacing, in_seed_start)
+
+module grid_of_tiles
+(
+	//Maximum grid size
+	in_rows = 1,
+	in_cols = 1,
+	//Number of tiles to generate in the grid
+	in_grass_road_two_way_straight = 1,
+	in_grass_road_three_way = 1,
+	in_grass_road_four_way = 1
+)
 {
     for (x = [0:in_cols-1])
     for (y = [0:in_rows-1])
     {
-        translate([x * spacing, y * spacing, 0])
-            tile_grass_crossroad_four_way(in_seed = in_seed_start+y*in_cols+x); // Random seed
-    }
+		n=x*in_cols+y;
+		echo("X Y N: ", x, y, n);
+		translate([x * gw_gridfinity_spacing, y * gw_gridfinity_spacing, 0])
+		if(n < in_grass_road_two_way_straight)
+		{	
+			tile_grass_road_straight(2);
+		}
+		else if
+		(
+			n <
+			in_grass_road_two_way_straight+
+			in_grass_road_three_way
+		)
+		{
+			tile_grass_road_straight(3);
+		}	
+		else if
+		(
+			n <
+			in_grass_road_two_way_straight+
+			in_grass_road_three_way+
+			in_grass_road_four_way
+		)
+		{
+			tile_grass_road_straight(4);
+		}	
+	}
 }
 
-module grid_of_tiles_three_ways(in_rows, in_cols, spacing, in_seed_start)
-{
-    for (x = [0:in_cols-1])
-    for (y = [0:in_rows-1])
-    {
-        translate([x * spacing, y * spacing, 0])
-            tile_grass_crossroad_three_way(in_seed = in_seed_start+y*in_cols+x); // Random seed
-    }
-}
-
-
-tile_grass_road();
-
-//grid_of_tiles(3,3,42,490);
-
-//grid_of_tiles_four_ways(2,2,42,520);
-
-//tile_grass_crossroad_three_way();
-
-//grid_of_tiles_three_ways(3,2,42,525);
+grid_of_tiles(5,5);
