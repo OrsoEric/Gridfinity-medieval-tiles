@@ -72,7 +72,7 @@ cornerelev = [[0, 0], [+0, 0]];
 module dummy(){}    // force customizer to stop here if it's active
 
 
-if (true)
+if (false)
 {
 terrain
 (
@@ -91,6 +91,7 @@ module terrain
 	iz_min_surface_height = 0,
 	iz_max_surface_height = 20,
 	in_erosion = 0,
+	in_height_roll = 0.2,
 	ib_boxed = true,
 	ir_corner_rounding = 3
 )
@@ -127,6 +128,7 @@ module terrain
 			ylen=in_width,
 			iz_min_surface_height=iz_min_surface_height,
 			iz_max_surface_height=iz_max_surface_height,
+			in_height_roll = in_height_roll,
 			box=true
 		);
 		roundbevels
