@@ -15,8 +15,13 @@ There are several parameters that can be cusomized, explained in the comments by
 
 The fractal terrain generator tends to produce mountain ridges and valleys aligned north-south or east-west. That's just a natural artifact of the algorithm. The ridges can change orientation slightly with more erosion.
 
-2024-12-22 Orso
+	2024-12-22 Orso
 created roundbevels to make rounded corners
+	2024-12-24 Orso
+made hill terrain
+	2024-12-26 Orso
+vast changes to surface generation to have a box of consistent base
+and controlled height variation
 */
 
 // ========== customizable parameters ==========
@@ -148,24 +153,23 @@ if (false)
 	(
 		in_max_levels = 4,
 		in_width = 100,
-		in_z_delta = 30,
-		in_z_offset = 20,
+		iz_min_surface_height = 2,
+		iz_max_surface_height = 22,
+		in_z_random = 10,
 		in_erosion = 0,
-		in_z_random = 5,
-		ir_corner_rounding = 3
+		in_height_roll = 0.5
 	);
 }
 module hill
 (
 	in_max_levels = 4,
 	in_width = 100,
-	//Maximum variation of the terrain
-	in_z_delta = 20,
-	//minimum height of the terrain
-	in_z_offset = 0,
+	iz_min_surface_height = 2,
+	iz_max_surface_height = 22,
+	in_z_random = 10,
 	in_erosion = 0,
-	in_z_random = 5,
-	ir_corner_rounding = 3
+	ir_corner_rounding = 3,
+	in_height_roll = 0.5
 )
 {
 	cornerelev = [[0, 0], [+0, 0]];
@@ -174,12 +178,11 @@ module hill
 		generate_square_2d_array
 		(
 			in_max_levels,
-			in_z_top=in_z_delta,
+			in_z_top=iz_max_surface_height,
 			in_z_random=in_z_random
 		);
 
 	// now make the landscape
-	//landscape = make_landscape(cornerelev, in_max_levels, randfield);
 	landscape = make_landscape(cornerelev, in_max_levels, linear_plane);
 
 	// erode the landscape (happens if erosionpasses > 0)
@@ -192,8 +195,9 @@ module hill
 			plotfield,
 			xlen=in_width,
 			ylen=in_width,
-			iz_min_surface_height=in_z_offset,
-			iz_max_surface_height=in_z_delta,
+			iz_min_surface_height=iz_min_surface_height,
+			iz_max_surface_height=iz_max_surface_height,
+			in_height_roll = in_height_roll,
 			box=true
 		);
 		roundbevels
@@ -201,8 +205,8 @@ module hill
 			ir_corner_rounding,
 			in_width,
 			in_width,
-			4*in_z_delta,
-			-2*in_z_delta-in_z_offset
+			4*iz_max_surface_height,
+			-2*iz_max_surface_height-iz_min_surface_height
 		);
     }
 }

@@ -23,7 +23,12 @@ module pin
 }
 
 // Module to create a truncated cone using rotate_extrude and polygon
-module truncated_cone(id_low, id_top, iz_height)
+module truncated_cone
+(
+	id_low,
+	id_top,
+	iz_height
+)
 {
     // Define the 2D profile for the truncated cone
     points = [
@@ -58,31 +63,6 @@ module house(in_length=30, in_width = 10, in_tall=15 , in_roof_ratio=1/4) {
 		]
 	);
 }
-
-/*
-function sum(v, dflt=0) =
-    _sum(v,v[0]*0);
-
-function _sum(v,_total,_i=0) = _i>=len(v) ? _total : _sum(v,_total+v[_i], _i+1);
-
-// Function to compute the [X, Y] average of a 2D vector
-function vector_average_2d(points) =
-    [
-        sum([p[0] for p = points]) / len(points), // Average of X values
-        sum([p[1] for p = points]) / len(points)  // Average of Y values
-    ];
-
-n_sum = sum([2,5,6,90]);
-echo("sum: ", n_sum);
-
-// Example usage
-points = [
-    [18.3, 18.3],
-    [10, 10],
-    [-10, 10],
-    [-18.3, 18.3]
-];
-*/
 
 module herald(iy_height, ix_width,iz_height)
 {
@@ -140,6 +120,8 @@ module round_tower
         );
     }
 }
+
+//church();
 
 //I use two houses to make a cross, and a round tower to make the bell
 module church

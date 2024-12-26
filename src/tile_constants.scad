@@ -14,6 +14,7 @@ gz_gridfinity_socket_offset = 5;
 //------------------------------------------------------------------------------
 //	GRASS CONSTANTS
 //------------------------------------------------------------------------------
+//Constants for generating default grass terrain used in most tiles
 
 //Maximum height at which grass will be found
 gz_grass_top_height = 11.5;
@@ -23,6 +24,16 @@ gz_grass_base = 2.5;
 gz_grass_flat = gz_grass_top_height -gz_gridfinity_socket_offset;
 //Maximum height consistency of flat grass tiles
 gn_grass_flat_consistency = 0.9;
+
+//------------------------------------------------------------------------------
+//	HILL CONSTANTS
+//------------------------------------------------------------------------------
+//Constant for generating hill terrain. Used for CHURCH Tile
+
+gz_grass_hill_top_height = 14;
+gz_grass_hill_height = gz_grass_hill_top_height -gz_gridfinity_socket_offset;
+gn_grass_hill_consistency = 0.9;
+gz_grass_hill_random = 4;
 
 //------------------------------------------------------------------------------
 //	ROAD CONSTANTS
@@ -38,8 +49,21 @@ gw_road_width = 7;
 gw_road_indent = 1.5;
 gz_road_indent = 1;
 
+//------------------------------------------------------------------------------
+//	CITY CONSTANTS
+//------------------------------------------------------------------------------
 
-
+gw_wall_width = 4;
+gw_wall_indent = 1.5;
+//Top Z of the wall
+gz_wall_top_height = 22;
+//Height of the wall
+gz_wall_height = 16;
+//How tall the towers stands above the walls
+gz_short_tower_above_wall=10;
+gz_tall_tower_above_wall=20;
+//Base of the city
+gz_plaza_top_height = 18;
 
 
 

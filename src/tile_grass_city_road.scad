@@ -1,21 +1,20 @@
-//This tile is the most complex
-//it creates a combination of city sides and road sides
-//With optional buildings
-
-//FEAT1: Walls
-
+//Credits to 2022 Jamie MIT License <vector76@gmail.com>
+//Repo: https://github.com/vector76/gridfinity_openscad
 include <gridfinity_modules.scad>
-
 
 //Credits to
 //https://www.printables.com/@Anachronist
 //https://www.printables.com/model/129126-procedural-weathered-fractal-terrain-in-openscad/files
 include <terrain.scad>
 
+//Tile Constants
+include <tile_constants.scad>
+
 //Define the weavy bars I use as roads
 include <road.scad>
 
-//Buildings definitions
+//Pin
+//Church
 include <building.scad>
 
 //AUX function to help with the rotation
@@ -27,38 +26,32 @@ function direction(angle) =
     (angle % 360 == 270) ? [1, -1] :
     [0, 0]; // Default for invalid inputs
 
+//------------------------------------------------------------------------------
+//	QUARTER CITY BLOCK
+//------------------------------------------------------------------------------
+
+//quarter_city_block();
 
 module quarter_city_block
 (
-	ir_orientation = 0,
-	in_z_wall_height = 16,
-	in_z_wall_top_height=22,
-	iz_plaza_top_height = 18,
-	iz_short_tower_above_wall=10,
-	iz_tall_tower_above_wall=20
+	ir_orientation = 0
 )
 {
-	n_gridfinity = 41;
-
-	//WALL PARAMETERS
-
-	nw_wall_width = 4;
-
 	//TOWER PARAMETERS
-	n_z_short_tower = in_z_wall_height +iz_short_tower_above_wall;
-	n_z_tall_tower = in_z_wall_height +iz_tall_tower_above_wall;
+	z_short_tower = gz_wall_height +gz_short_tower_above_wall;
+	z_tall_tower = gz_wall_height +gz_tall_tower_above_wall;
 
 	//COMPUTE POINTS
 
-	n_corner = n_gridfinity/2-2.2;
+	n_corner = gw_gridfinity_half_pitch-2.2;
 	n_edge = 10;
 
 	dir = direction(ir_orientation);
 	start_l = [ dir[0]*n_corner, dir[1]*n_corner];
 	end_l = [ dir[0]*n_edge, dir[1]*n_edge];
 	corner_l = (ir_orientation % 180 == 0) ?
-		[ dir[0]*n_corner, dir[1]*n_gridfinity/2] :
-		[ dir[0]*n_gridfinity/2, dir[1]*n_corner] ;
+		[ dir[0]*n_corner, dir[1]*gw_gridfinity_half_pitch] :
+		[ dir[0]*gw_gridfinity_half_pitch, dir[1]*n_corner] ;
 
 	echo("Left Points: ", start_l, end_l);
 
@@ -66,81 +59,81 @@ module quarter_city_block
 	start_r = [ dir_r[0]*n_corner, dir_r[1]*n_corner];
 	end_r = [ dir_r[0]*n_edge, dir_r[1]*n_edge];
 	corner_r = (ir_orientation % 180 == 0) ?
-		[ dir_r[0]*n_corner, dir_r[1]*n_gridfinity/2] :
-		[ dir_r[0]*n_gridfinity/2, dir_r[1]*n_corner] ;
+		[ dir_r[0]*n_corner, dir_r[1]*gw_gridfinity_half_pitch] :
+		[ dir_r[0]*gw_gridfinity_half_pitch, dir_r[1]*n_corner] ;
 
 	echo("Right Points ", start_r, end_r);
 	
 	//I want three wall chunks and two towers
 
 	//LEFT BOTTOM TOWER
-	translate([start_l[0],start_l[1],in_z_wall_top_height-in_z_wall_height])
+	translate([start_l[0],start_l[1],gz_wall_top_height-gz_wall_height])
 	round_tower
 	(
 		ir_stalk = 2,
 		ir_top = 2.5,
-		iz_height = n_z_short_tower,
+		iz_height = z_short_tower,
 		in_stalk_ratio = 5/7,
 		in_roof_ratio = 1/7
 	);
 
 	//LEFT WALL
-	translate([0,0,in_z_wall_top_height-in_z_wall_height])
+	translate([0,0,gz_wall_top_height-gz_wall_height])
 	wall_with_indent
 	(
 		start_l,
 		end_l,
-		in_w=nw_wall_width,
-		in_z_height=in_z_wall_height,
+		in_w=gw_wall_width,
+		in_z_height=gz_wall_height,
 		in_w_indent = 1.5,
 		in_z_indent=2
 	);
 
 	//LEFT TOP TOWER
-	translate([end_l[0],end_l[1],in_z_wall_top_height-in_z_wall_height])
-	round_tower(ir_stalk = 2, ir_top = 3, iz_height = n_z_tall_tower);
+	translate([end_l[0],end_l[1],gz_wall_top_height-gz_wall_height])
+	round_tower(ir_stalk = 2, ir_top = 3, iz_height = z_tall_tower);
 
 	//FRONT WALL
-	translate([0,0,in_z_wall_top_height-in_z_wall_height])
+	translate([0,0,gz_wall_top_height-gz_wall_height])
 	wall_with_indent
 	(
 		end_l,
 		end_r,
-		in_w=nw_wall_width,
-		in_z_height=in_z_wall_height,
+		in_w=gw_wall_width,
+		in_z_height=gz_wall_height,
 		in_w_indent = 1.5,
 		in_z_indent=2
 	);
 
 	//RIGHT TOP TOWER
-	translate([end_r[0],end_r[1],in_z_wall_top_height-in_z_wall_height])
-	round_tower(ir_stalk = 2, ir_top = 3, iz_height = n_z_tall_tower);
+	translate([end_r[0],end_r[1],gz_wall_top_height-gz_wall_height])
+	round_tower(ir_stalk = 2, ir_top = 3, iz_height = z_tall_tower);
 
-	translate([0,0,in_z_wall_top_height-in_z_wall_height])
+	translate([0,0,gz_wall_top_height-gz_wall_height])
 	wall_with_indent
 	(
 		start_r,
 		end_r,
-		in_w=nw_wall_width,
-		in_z_height=in_z_wall_height,
+		in_w=gw_wall_width,
+		in_z_height=gz_wall_height,
 		in_w_indent = 1.5,
 		in_z_indent=2
 	);
 
 	//RIGHT BOTTOM TOWER
-	translate([start_r[0],start_r[1],in_z_wall_top_height-in_z_wall_height])
+	translate([start_r[0],start_r[1],gz_wall_top_height-gz_wall_height])
 	round_tower
 	(
 		ir_stalk = 2,
 		ir_top = 2.5,
-		iz_height = n_z_short_tower,
+		iz_height = z_short_tower,
 		in_stalk_ratio = 5/7,
 		in_roof_ratio = 1/7
 	);
 
 	//CITY PLAZA
 	//Platform where the buildings are spawned
-	translate([0,0,in_z_wall_top_height-in_z_wall_height])
+	translate([0,0,gz_wall_top_height-gz_wall_height])
 	city
 	(
 		[
@@ -149,13 +142,109 @@ module quarter_city_block
 			end_r,
 			corner_r
 		],
-		iz_plaza_height = iz_plaza_top_height-in_z_wall_top_height+in_z_wall_height
+		iz_plaza_height = gz_plaza_top_height-gz_wall_top_height+gz_wall_height
 	);
-
 }
 
+//------------------------------------------------------------------------------
+//	GRASS TILE + CHURCH + STRAIGHT ROAD OPTION
+//------------------------------------------------------------------------------
+
+tile_grass_city_quarter(270);
+
 //A grass tile with a road going straight through
-module tile_grass_city_quarter(ir_second_block = 0)
+module tile_grass_city_quarter
+(
+	ir_second_block = 0,
+	ib_road = true
+)
+{
+	difference()
+	{
+		union()
+		{
+			//Instance a gridfinity base tile
+			grid_block
+			(
+				num_x=1,
+				num_y=1,
+				num_z=0.5,
+				magnet_diameter=0,
+				screw_depth=0
+			);
+			//Instance fractal terrain
+			translate([0,0,gz_gridfinity_socket_offset])
+			terrain
+			(
+				in_max_levels = 4,
+				in_width = gw_gridfinity,
+				iz_min_surface_height = gz_grass_base,
+				iz_max_surface_height = gz_grass_flat,
+				//I want grass to have very consistent max height
+				in_height_roll = gn_grass_flat_consistency,
+				in_erosion = 1
+			);
+			
+			quarter_city_block();
+
+			if (ir_second_block!=0)
+			{
+				quarter_city_block(ir_second_block);
+			}
+
+			//on top create a half weavy road
+			if (ib_road == true)
+			{
+				rotate([0,0,90])
+				translate([gw_gridfinity*(1/8+1/4),0,gz_road_top_height-gz_road_height])
+				bar_sin_indented
+				(
+					in_l = gw_gridfinity/4,
+					in_w = gw_road_width,
+					in_z = gz_road_height,
+					in_w_amplitude = -1,
+					in_frequency = 0
+				);
+			}
+		}
+		union()
+		{
+			if (ib_road == true)
+			{
+				pin
+				(
+					in_x = +0.0 *gw_gridfinity_half_pitch,
+					in_y = +0.8 *gw_gridfinity_half_pitch,
+					in_z_top = gz_road_top_height,
+					in_z_drill = 10
+				);
+			}
+			pin
+			(
+				in_x = -0.6 *gw_gridfinity_half_pitch,
+				in_y = +0.6 *gw_gridfinity_half_pitch,
+				in_z_top = gz_grass_hill_top_height,
+				in_z_drill = 9
+			);
+			pin
+			(
+				in_x = -0.0 *gw_gridfinity_half_pitch,
+				in_y = +0.3 *gw_gridfinity_half_pitch,
+				in_z_top = 24,
+				in_z_drill = 5
+			);
+		}
+	}
+}
+
+//------------------------------------------------------------------------------
+//	OLD
+//------------------------------------------------------------------------------
+
+//tile_grass_city_quarter();
+
+//A grass tile with a road going straight through
+module tile_grass_city_quarter_old(ir_second_block = 0)
 {
 	//the road reaches up to this height
 	n_z_road_top_height = 14;
