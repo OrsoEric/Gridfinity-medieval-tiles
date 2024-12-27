@@ -260,7 +260,8 @@ module river
 (
 	//log2 Points composing the 2D field
 	in_max_levels = 4,
-	//Width of the tile
+	//SIZE of the tile
+	in_length = 200,
 	in_width = 100,
 	//Minimum and maximum height allowed in the tile
 	iz_min_surface_height = 2,
@@ -314,7 +315,7 @@ module river
 			surfaceplot
 			(
 				plotfield,
-				xlen=in_width,
+				xlen=in_length,
 				ylen=in_width,
 				iz_min_surface_height=iz_min_surface_height,
 				iz_max_surface_height=iz_max_surface_height,
@@ -326,10 +327,10 @@ module river
 			polygon
 			(
 				[
-					[-in_width/2, -in_width*(1/2-1/4)],
-					[-in_width/2, +in_width*(1/2-1/4)],
-					[+in_width/2, +in_width*(1/2-1/4)],
-					[+in_width/2, -in_width*(1/2-1/4)],
+					[-in_length/2, -in_width*(1/2-1/4)],
+					[-in_length/2, +in_width*(1/2-1/4)],
+					[+in_length/2, +in_width*(1/2-1/4)],
+					[+in_length/2, -in_width*(1/2-1/4)],
 				]
 			);
 		}
@@ -338,7 +339,7 @@ module river
 			roundbevels
 			(
 				ir_corner_rounding,
-				in_width,
+				in_length,
 				in_width,
 				4*iz_max_surface_height,
 				-2*iz_max_surface_height-iz_min_surface_height

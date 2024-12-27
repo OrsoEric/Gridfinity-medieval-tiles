@@ -143,7 +143,7 @@ if (false)
 }
 
 //tile_river_turn(true,false, false);
-tile_river_turn(false,true, true);
+//tile_river_turn(false,true, true);
 
 //A grass tile with a road going straight through
 module tile_river_turn
@@ -232,3 +232,99 @@ module tile_river_turn
 		}
 	}
 }
+
+//------------------------------------------------------------------------------
+//	RIVER SOURCE
+//------------------------------------------------------------------------------
+// This is a 1x2 tile with a mountain in the middle and two rivers at its side
+// It's a source that forks
+
+
+if (true)
+{
+	tile_river_source_wide
+	(
+		ib_bridge = true,
+		ib_one_quarter_city_first = true
+	);
+}
+
+module tile_river_source_wide
+(
+	ib_bridge = false,
+	ib_one_quarter_city_first = true
+)
+{
+	difference()
+	{
+		union()
+		{
+			//Instance a gridfinity base tile
+			grid_block
+			(
+				num_x				= 2,
+				num_y 				= 1,
+				num_z 				= 0.5,
+				magnet_diameter		= 0,
+				screw_depth			= 0
+			);
+			//Instance fractal terrain
+			translate([gw_gridfinity_spacing/2,0,gz_gridfinity_socket_offset])
+			river
+			(
+				in_max_levels			= 6,
+				in_length				= gw_gridfinity_spacing+gw_gridfinity,
+				in_width 				= gw_gridfinity,
+				iz_min_surface_height 	= gz_grass_base,
+				iz_max_surface_height 	= gz_grass_river_height,
+				iz_random 				= gz_grass_river_roughness,
+				iz_river_level 			= gz_water_top_height,
+				ir_corner_rounding 		= gr_corner_terrain_rounding,
+				in_erosion				= 1
+			);
+			translate([gw_gridfinity_spacing/2,0,gz_gridfinity_socket_offset])
+			hill
+			(
+				in_max_levels 			= 5,
+				in_width 				= gw_gridfinity*7/8,
+				iz_min_surface_height 	= 2,
+				iz_max_surface_height 	= 50,
+				in_z_random 			= 20,
+				in_erosion				= 1,
+				in_height_roll 			= 0.9
+			);
+			//Instance first city quarter
+			if (ib_one_quarter_city_first == true)
+			{
+				quarter_city_block();
+			}
+			
+			//on top create a half weavy road
+			if (ib_bridge == true)
+			{
+				rotate([0,0,90])
+				translate([0,0,gz_road_top_height-gz_bridge_height])
+				arch_indented
+				(
+					//Length of the arch
+					il_length = gw_gridfinity,
+					//vertical thickness of the arch
+					iz_thickness = gz_bridge_height,
+					//width of the arch
+					iw_width=gw_road_width,
+					//How tall is the hump
+					iz_height=gz_bridge_hump
+				);
+			}
+		}
+		union()
+		{
+		}
+	}
+}
+
+//------------------------------------------------------------------------------
+//	RIVER LAKE
+//------------------------------------------------------------------------------
+
+
