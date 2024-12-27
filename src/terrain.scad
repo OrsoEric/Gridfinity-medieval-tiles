@@ -247,7 +247,7 @@ function interpolate_xy(x, y, size, Ztarget) =
     Ztarget * (d);
 
 //------------------------------------------------------------------------------
-//	RIVER
+//	RIVER STRAIGHT
 //------------------------------------------------------------------------------
 //	Generates a fractal terrain featuring linear depression that cut across the length of the tile. Suitable to make mountain chain and rivers (?)
 
@@ -347,7 +347,6 @@ module river
     }
 }
 
-
 //Generates the initial seed for the spine generation, with a depression/spine across x = 0
 function generate_square_2d_array_canyon
 (
@@ -372,6 +371,138 @@ function generate_square_2d_array_canyon
 			
         ]
     ];
+
+
+//------------------------------------------------------------------------------
+//	RIVER TURN
+//------------------------------------------------------------------------------
+
+if (false)
+{
+	river_turn();
+}
+
+module river_turn
+(
+	//log2 Points composing the 2D field
+	in_max_levels = 4,
+	//Width of the tile
+	in_width = 100,
+	//Minimum and maximum height allowed in the tile
+	iz_min_surface_height = 2,
+	iz_max_surface_height = 42,
+	//Random noise added to the field
+	iz_random = 40,
+	//Height at which the river bed is generated
+	iz_river_level = 20,
+	//Erosion will smooth out the geometry
+	in_erosion = 0,
+	//Make the corner rounded
+	ir_corner_rounding = 3,
+	//This will allow maximum height to be lower down to this percentage
+	in_height_roll = 0.9
+)
+{
+	cornerelev = [[0, 0], [+0, 0]];
+
+	canyon_plane =
+		generate_square_2d_array_canyon_turn
+		(
+			in_level = in_max_levels,
+			iz_min = iz_max_surface_height,
+			iz_top = iz_min_surface_height,
+			iz_random = iz_random
+		);
+
+	//echo("River: ",canyon_plane); 
+
+	// now make the landscape
+	landscape =
+	make_landscape
+	(
+		cornerelev,
+		in_max_levels,
+		canyon_plane
+	);
+
+	// erode the landscape (happens if erosionpasses > 0)
+	plotfield =
+	grayerode
+	(
+		landscape,
+		passes=in_erosion
+	);
+
+    difference()
+	{
+		union()
+		{
+			surfaceplot
+			(
+				plotfield,
+				xlen=in_width,
+				ylen=in_width,
+				iz_min_surface_height=iz_min_surface_height,
+				iz_max_surface_height=iz_max_surface_height,
+				in_height_roll = in_height_roll,
+				box=true
+			);
+			color("blue");
+			linear_extrude(iz_river_level)
+			polygon
+			(
+				[
+					//SW-
+					[-in_width*(1/2-1/4), -in_width*(1/2)],
+					[-in_width*(1/2-1/4), -in_width*(1/2-1/4)],
+					[-in_width*(1/2), -in_width*(1/2-1/4)],
+					//NW
+					[-in_width*(1/2), +in_width*(1/2-1/4)],
+					//NE
+					[+in_width*(1/2-1/4), +in_width*(1/2-1/4)],
+					//SE
+					[+in_width*(1/2-1/4), -in_width*(1/2)],
+				]
+			);
+		}
+		union()
+		{
+			roundbevels
+			(
+				ir_corner_rounding,
+				in_width,
+				in_width,
+				4*iz_max_surface_height,
+				-2*iz_max_surface_height-iz_min_surface_height
+			);
+		}
+    }
+}
+
+//Generates the initial seed for the spine generation, with a depression/spine across x = 0
+function generate_square_2d_array_canyon_turn
+(
+	in_level = 2,
+	iz_min = 10,
+	iz_top = 0,
+	iz_random = 1
+) =
+    let(n_size = pow(2, in_level))
+    [
+        for (n_y = [0 : n_size - 1])
+		[
+            for (n_x = [0 : n_size - 1])
+				let
+				(
+					//on one diagonal i generate on X, on the other on Y, this gets me a 90° turn on the river
+					d=n_x>n_y?sin(n_x/(n_size-1)*(1.5*360)):sin(n_y/(n_size-1)*(1.5*360))
+				)
+				iz_min*(d)+iz_top*d +rands(-0.5*iz_random,0.5*iz_random,1)[0]
+			
+        ]
+    ];
+
+
 
 
 // ========== rendering modules ==========

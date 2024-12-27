@@ -56,6 +56,9 @@ module bar_sin_indented
 }
 
 
+//------------------------------------------------------------------------------
+//	ROAD TURN
+//------------------------------------------------------------------------------
 
 module bar_curved(in_r, in_w, in_z)
 {
@@ -94,6 +97,7 @@ module bar_curved_weavy(in_r, in_w, in_z, in_w_amplitude=1/30, in_frequency=2)
 		]
 	);
 }
+
 module bar_curved_weavy_indented
 (
 	in_r,
@@ -124,6 +128,91 @@ module bar_curved_weavy_indented
 			in_w_amplitude=in_w_amplitude,
 			in_frequency=in_frequency
 		);
+	}
+}
+
+//bar_curved_weavy_slanted();
+
+module bar_curved_weavy_slanted
+(
+	in_r=30,
+	in_w=7,
+	in_z=7,
+	//It cuts diagonally both sides to make a ramp
+	ir_slant = 3.5,
+	in_w_amplitude=1/30,
+	in_frequency=2
+)
+{
+
+	difference()
+	{
+		union()
+		{
+			bar_curved_weavy
+			(
+				in_r = in_r,
+				in_w = in_w,
+				in_z = in_z,
+				in_w_amplitude=in_w_amplitude,
+				in_frequency=in_frequency
+			);
+			
+		}		
+		union()
+		{
+			//diagonal cut
+			translate([0,-in_r+ir_slant/2/sqrt(2),in_z+ir_slant/sqrt(2)])
+			rotate([45,0,0])
+			cube([in_w+ir_slant,ir_slant*3,ir_slant*2],center=true);
+			//diagonal cut
+			translate([-in_r+ir_slant/2/sqrt(2),0,in_z+ir_slant/sqrt(2)])
+			rotate([45,0,-90])
+			cube([in_w+ir_slant,ir_slant*3,ir_slant*2],center=true);
+		}
+	}
+
+}
+
+//bar_curved_weavy_indented_slanted();
+
+module bar_curved_weavy_indented_slanted
+(
+	in_r = 30,
+	in_w = 7,
+	in_z = 7,
+	//It cuts diagonally both sides to make a ramp
+	ir_slant = 3.5,
+	in_w_amplitude=1/30,
+	iw_indent = 1.5,
+	iz_indent = 1,
+	in_frequency=2
+)
+{
+	difference()
+	{
+		union()
+		{
+			bar_curved_weavy_indented
+			(
+				in_r,
+				in_w = in_w,
+				in_z = in_z,
+				in_w_amplitude=in_w_amplitude,
+				in_frequency=in_frequency
+			);
+		}
+		union()
+		{
+			//diagonal cut
+			translate([0,-in_r+ir_slant/2/sqrt(2),in_z+ir_slant/sqrt(2)])
+			rotate([45,0,0])
+			cube([in_w+ir_slant,ir_slant*3,ir_slant*2],center=true);
+			//diagonal cut
+			translate([-in_r+ir_slant/2/sqrt(2),0,in_z+ir_slant/sqrt(2)])
+			rotate([45,0,-90])
+			cube([in_w+ir_slant,ir_slant*3,ir_slant*2],center=true);
+		}
 	}
 }
 

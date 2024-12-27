@@ -88,5 +88,5 @@ gz_water_top_height = 6;
 gz_grass_river_top_height = 16;
 gz_grass_river_height = gz_grass_river_top_height -gz_gridfinity_socket_offset;
 //Randomness of the terrain
-gz_grass_river_roughness = 12;
+gz_grass_river_roughness = 20;
 
