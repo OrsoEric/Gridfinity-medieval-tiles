@@ -31,7 +31,7 @@ if (false)
 	);
 }
 
-//tile_river_straight(true, true, true);
+//tile_river_straight(true,true,true);
 //tile_river_straight(true, false, false);
 
 //A grass tile with a road going straight through
@@ -97,53 +97,145 @@ module tile_river_straight
 					//How tall is the hump
 					iz_height=gz_bridge_hump
 				);
+				//use two pins to support the bridge
+				pin
+				(
+					in_x = +0.09 *gw_gridfinity_half_pitch,
+					in_y = -0.19 *gw_gridfinity_half_pitch,
+					in_z_top = gz_grass_river_top_height,
+					in_z_drill = 9
+				);
+				pin
+				(
+					in_x = -0.09 *gw_gridfinity_half_pitch,
+					in_y = -0.19 *gw_gridfinity_half_pitch,
+					in_z_top = gz_grass_river_top_height,
+					in_z_drill = 9
+				);
+				pin
+				(
+					in_x = -0.09 *gw_gridfinity_half_pitch,
+					in_y = +0.19 *gw_gridfinity_half_pitch,
+					in_z_top = gz_grass_river_top_height,
+					in_z_drill = 9
+				);
+				pin
+				(
+					in_x = +0.09 *gw_gridfinity_half_pitch,
+					in_y = +0.19 *gw_gridfinity_half_pitch,
+					in_z_top = gz_grass_river_top_height,
+					in_z_drill = 9
+				);
+
 			}
+
+			
+
 		}
 		union()
 		{
-			if (ib_bridge == true)
+			//NORTH WEST GRASS PIN
+			pin
+			(
+				in_x = -0.85 *gw_gridfinity_half_pitch,
+				in_y = +0.45 *gw_gridfinity_half_pitch,
+				in_z_top = gz_grass_river_top_height,
+				in_z_drill = 9
+			);
+			//SOUTH EAST GRASS PIN
+			pin
+			(
+				in_x = +0.85 *gw_gridfinity_half_pitch,
+				in_y = -0.45 *gw_gridfinity_half_pitch,
+				in_z_top = gz_grass_river_top_height,
+				in_z_drill = 9
+			);
+			///BRIDGE PIN
+			//If I have a bridge and no second city
+			if ((ib_bridge == true) && (ib_one_quarter_city_second==false))
 			{
+				//bridge pin
 				pin
 				(
 					in_x = +0.0 *gw_gridfinity_half_pitch,
-					in_y = +0.8 *gw_gridfinity_half_pitch,
-					in_z_top = gz_road_top_height,
-					in_z_drill = 10
+					in_y = -0.8 *gw_gridfinity_half_pitch,
+					in_z_top = gz_road_top_height+gz_bridge_height,
+					in_z_drill = 10+gz_bridge_height
 				);
 			}
-			pin
-			(
-				in_x = -0.6 *gw_gridfinity_half_pitch,
-				in_y = +0.6 *gw_gridfinity_half_pitch,
-				in_z_top = gz_grass_hill_top_height,
-				in_z_drill = 9
-			);
-			pin
-			(
-				in_x = -0.0 *gw_gridfinity_half_pitch,
-				in_y = +0.3 *gw_gridfinity_half_pitch,
-				in_z_top = 24,
-				in_z_drill = 5
-			);
+			///FIRST CITY PIN
+			//If I have the first city, place a pin on it and a pin on it's grass
+			if (ib_one_quarter_city_first==true)
+			{
+				//City Pin
+				pin
+				(
+					in_x = +0.2 *gw_gridfinity_half_pitch,
+					in_y = +0.8 *gw_gridfinity_half_pitch,
+					in_z_top = gz_wall_top_height+2,
+					in_z_drill = 12
+				);
+			}	
+			///SECOND CITY PIN
+			//If I have the first city, place a pin on it and a pin on it's grass
+			if (ib_one_quarter_city_second==true)
+			{
+				//City Pin
+				pin
+				(
+					in_x = -0.2 *gw_gridfinity_half_pitch,
+					in_y = -0.8 *gw_gridfinity_half_pitch,
+					in_z_top = gz_wall_top_height+2,
+					in_z_drill = 12
+				);
+			}	
+			///NORTH EAST GRASS PIN
+			//if I have the bridge or I have the first city
+			if ((ib_one_quarter_city_first==true) || (ib_bridge == true))
+			{
+				pin
+				(
+					in_x = +0.85 *gw_gridfinity_half_pitch,
+					in_y = +0.45 *gw_gridfinity_half_pitch,
+					in_z_top = gz_grass_river_top_height,
+					in_z_drill = 9
+				);
+			}
+
+			//SOUTH WEST GRASS PIN
+			//if I have the bridge or I have the second city
+			if ((ib_one_quarter_city_second==true) || (ib_bridge == true))
+			{
+				pin
+				(
+					in_x = -0.85 *gw_gridfinity_half_pitch,
+					in_y = -0.45 *gw_gridfinity_half_pitch,
+					in_z_top = gz_grass_river_top_height,
+					in_z_drill = 9
+				);
+			}
+
 		}
 	}
 }
-
 
 //------------------------------------------------------------------------------
 //	RIVER TILE TURN + OPTION BRIDGE + OPTION 2X ONE QUARTER CITY
 //------------------------------------------------------------------------------
 
-if (false)
-{
-	tile_river_turn
-	(
-		ib_one_quarter_city_first = false,
-		ib_one_quarter_city_second = false
-	);
-}
+//vanilla
+//tile_river_turn(false,false, false);
 
+//road
 //tile_river_turn(true,false, false);
+
+//First City
+//tile_river_turn(false,true, false);
+
+//Second City
+//tile_river_turn(false,false,true);
+
+//First and second city
 //tile_river_turn(false,true, true);
 
 //A grass tile with a road going straight through
@@ -212,6 +304,67 @@ module tile_river_turn
 		}
 		union()
 		{
+			//SOUTH WEST GRASS PIN			
+			pin
+			(
+				in_x = -0.8 *gw_gridfinity_half_pitch,
+				in_y = -0.8 *gw_gridfinity_half_pitch,
+				in_z_top = gz_grass_river_top_height,
+				in_z_drill = 9
+			);
+
+			//If I don't have the second city
+			if (ib_one_quarter_city_second == false)
+			{
+				//NORTH EAST PIN
+				pin
+				(
+					in_x = +0.8 *gw_gridfinity_half_pitch,
+					in_y = +0.5 *gw_gridfinity_half_pitch,
+					in_z_top = gz_grass_river_top_height,
+					in_z_drill = 9
+				);
+			}
+			//I need to move the pin a little
+			else
+			{
+				//NORTH EAST PIN
+				pin
+				(
+					in_x = +0.4 *gw_gridfinity_half_pitch,
+					in_y = +0.8 *gw_gridfinity_half_pitch,
+					in_z_top = gz_grass_river_top_height,
+					in_z_drill = 9
+				);
+			}
+
+
+			//If I have the road or the first city
+			if ((ib_one_quarter_city_first == true) || (ib_road_turn == true))
+			{
+				//NORTH WEST PIN
+				pin
+				(
+					in_x = -0.8 *gw_gridfinity_half_pitch,
+					in_y = +0.45 *gw_gridfinity_half_pitch,
+					in_z_top = gz_grass_river_top_height,
+					in_z_drill = 9
+				);
+			
+			}
+			//If I have the road or the second city
+			if ((ib_one_quarter_city_second == true) || (ib_road_turn == true))
+			{
+				//SOUTH EAST PIN
+				pin
+				(
+					in_x = +0.45 *gw_gridfinity_half_pitch,
+					in_y = -0.8 *gw_gridfinity_half_pitch,
+					in_z_top = gz_grass_river_top_height,
+					in_z_drill = 9
+				);
+			
+			}
 		}
 	}
 }
@@ -234,7 +387,7 @@ if (false)
 
 module tile_river_source_wide
 (
-	ib_bridge = false,
+	ib_bridge=true,
 	ib_one_quarter_city_first = true
 )
 {
@@ -324,7 +477,6 @@ if (false)
 //A grass tile with a road going straight through
 module tile_river_lake
 (
-	ib_road_turn = false,
 	ib_one_quarter_city_first = false
 )
 {
@@ -379,9 +531,25 @@ module grid_of_tiles
 	in_rows = 1,
 	in_cols = 1,
 	//Number of tiles to generate in the grid
-	in_river_straight = 1,
-	in_river_straight_with_bridge = 1,
+	in_river_straight = 3,
+	in_river_straight_with_bridge = 4,
+	in_river_straight_with_single_one_quarter_city = 1,
+	in_river_straight_with_bridge_and_single_one_quarter_city = 1,
+	in_river_straight_with_double_one_quarter_city = 1,
+	in_river_straight_with_bridged_double_one_quarter_city = 1,
 	
+	in_river_turn = 3,
+	in_river_turn_with_road_turn = 4,
+	in_river_turn_left_with_single_one_quarter_city = 1,
+	in_river_turn_right_with_single_one_quarter_city = 1,
+	in_river_turn_with_double_one_quarter_city = 1,
+
+	in_lake = 1,
+	in_lake_with_city = 1,
+
+	in_spring = 1,
+
+	dummy
 )
 {
     for (x = [0:in_cols-1])
@@ -403,7 +571,198 @@ module grid_of_tiles
 		{
 			tile_river_straight(true, false, false);
 		}	
-		
+		else if
+		(
+			n <
+			in_river_straight+
+			in_river_straight_with_bridge+
+			in_river_straight_with_single_one_quarter_city
+		)
+		{
+			tile_river_straight(false, true, false);
+		}	
+		else if
+		(
+			n <
+			in_river_straight+
+			in_river_straight_with_bridge+
+			in_river_straight_with_single_one_quarter_city+
+			in_river_straight_with_bridge_and_single_one_quarter_city
+		)
+		{
+			tile_river_straight(true, true, false);
+		}
+		else if
+		(
+			n <
+			in_river_straight+
+			in_river_straight_with_bridge+
+			in_river_straight_with_single_one_quarter_city+
+			in_river_straight_with_bridge_and_single_one_quarter_city+
+			in_river_straight_with_double_one_quarter_city
+		)
+		{
+			tile_river_straight(false, true, true);
+		}
+		else if
+		(
+			n <
+			in_river_straight+
+			in_river_straight_with_bridge+
+			in_river_straight_with_single_one_quarter_city+
+			in_river_straight_with_bridge_and_single_one_quarter_city+
+			in_river_straight_with_double_one_quarter_city+
+			in_river_straight_with_bridged_double_one_quarter_city
+		)
+		{
+			tile_river_straight(true, true, true);
+		}
+		else if
+		(
+			n <
+			in_river_straight+
+			in_river_straight_with_bridge+
+			in_river_straight_with_single_one_quarter_city+
+			in_river_straight_with_bridge_and_single_one_quarter_city+
+			in_river_straight_with_double_one_quarter_city+
+			in_river_straight_with_bridged_double_one_quarter_city+
+			in_river_turn
+		)
+		{
+			tile_river_turn(false, false, false);
+		}
+		else if
+		(
+			n <
+			in_river_straight+
+			in_river_straight_with_bridge+
+			in_river_straight_with_single_one_quarter_city+
+			in_river_straight_with_bridge_and_single_one_quarter_city+
+			in_river_straight_with_double_one_quarter_city+
+			in_river_straight_with_bridged_double_one_quarter_city+
+			in_river_turn+
+			in_river_turn_with_road_turn
+		)
+		{
+			tile_river_turn(true, false, false);
+		}
+		else if
+		(
+			n <
+			in_river_straight+
+			in_river_straight_with_bridge+
+			in_river_straight_with_single_one_quarter_city+
+			in_river_straight_with_bridge_and_single_one_quarter_city+
+			in_river_straight_with_double_one_quarter_city+
+			in_river_straight_with_bridged_double_one_quarter_city+
+			in_river_turn+
+			in_river_turn_with_road_turn+
+			in_river_turn_left_with_single_one_quarter_city
+		)
+		{
+			tile_river_turn(false, true, false);
+		}
+		else if
+		(
+			n <
+			in_river_straight+
+			in_river_straight_with_bridge+
+			in_river_straight_with_single_one_quarter_city+
+			in_river_straight_with_bridge_and_single_one_quarter_city+
+			in_river_straight_with_double_one_quarter_city+
+			in_river_straight_with_bridged_double_one_quarter_city+
+			in_river_turn+
+			in_river_turn_with_road_turn+
+			in_river_turn_left_with_single_one_quarter_city+
+			in_river_turn_right_with_single_one_quarter_city
+		)
+		{
+			tile_river_turn(false, false, true);
+		}
+		else if
+		(
+			n <
+			in_river_straight+
+			in_river_straight_with_bridge+
+			in_river_straight_with_single_one_quarter_city+
+			in_river_straight_with_bridge_and_single_one_quarter_city+
+			in_river_straight_with_double_one_quarter_city+
+			in_river_straight_with_bridged_double_one_quarter_city+
+			in_river_turn+
+			in_river_turn_with_road_turn+
+			in_river_turn_left_with_single_one_quarter_city+
+			in_river_turn_right_with_single_one_quarter_city+
+			in_river_turn_with_double_one_quarter_city
+		)
+		{
+			tile_river_turn(false, true, true);
+		}
+
+		else if
+		(
+			n <
+			in_river_straight+
+			in_river_straight_with_bridge+
+			in_river_straight_with_single_one_quarter_city+
+			in_river_straight_with_bridge_and_single_one_quarter_city+
+			in_river_straight_with_double_one_quarter_city+
+			in_river_straight_with_bridged_double_one_quarter_city+
+			in_river_turn+
+			in_river_turn_with_road_turn+
+			in_river_turn_left_with_single_one_quarter_city+
+			in_river_turn_right_with_single_one_quarter_city+
+			in_river_turn_with_double_one_quarter_city+
+			in_lake
+		)
+		{
+			tile_river_lake(false);
+		} 
+		else if
+		(
+			n <
+			in_river_straight+
+			in_river_straight_with_bridge+
+			in_river_straight_with_single_one_quarter_city+
+			in_river_straight_with_bridge_and_single_one_quarter_city+
+			in_river_straight_with_double_one_quarter_city+
+			in_river_straight_with_bridged_double_one_quarter_city+
+			in_river_turn+
+			in_river_turn_with_road_turn+
+			in_river_turn_left_with_single_one_quarter_city+
+			in_river_turn_right_with_single_one_quarter_city+
+			in_river_turn_with_double_one_quarter_city+
+			in_lake+
+			in_lake_with_city
+		)
+		{
+			tile_river_lake(true);
+		} 
+
+		else if
+		(
+			n <
+			in_river_straight+
+			in_river_straight_with_bridge+
+			in_river_straight_with_single_one_quarter_city+
+			in_river_straight_with_bridge_and_single_one_quarter_city+
+			in_river_straight_with_double_one_quarter_city+
+			in_river_straight_with_bridged_double_one_quarter_city+
+			in_river_turn+
+			in_river_turn_with_road_turn+
+			in_river_turn_left_with_single_one_quarter_city+
+			in_river_turn_right_with_single_one_quarter_city+
+			in_river_turn_with_double_one_quarter_city+
+			in_lake+
+			in_lake_with_city+
+			in_spring
+		)
+		{
+			rotate([0,0,90])
+			tile_river_source_wide();
+		} 
+
+
+
 		else
 		{
 			//DO NOT SPAWN TILES
