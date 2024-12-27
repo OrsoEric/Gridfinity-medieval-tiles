@@ -11,6 +11,9 @@ gw_gridfinity_half_pitch = gw_gridfinity/2;
 //height above which I can put geometry without interfering with the gridfinity socket
 gz_gridfinity_socket_offset = 5;
 
+//Rounding radious of the corners
+gr_corner_terrain_rounding = 3.75;
+
 //------------------------------------------------------------------------------
 //	GRASS CONSTANTS
 //------------------------------------------------------------------------------
@@ -50,6 +53,16 @@ gw_road_indent = 1.5;
 gz_road_indent = 1;
 
 //------------------------------------------------------------------------------
+//	BRIDGE CONSTANTS
+//------------------------------------------------------------------------------
+// Bridges are roads that arch upward
+
+//vertical thickness of the bridge
+gz_bridge_height = 5;
+//How tall the hump raises above the corners of the bridge
+gz_bridge_hump = 6;
+
+//------------------------------------------------------------------------------
 //	CITY CONSTANTS
 //------------------------------------------------------------------------------
 
@@ -60,10 +73,20 @@ gz_wall_top_height = 22;
 //Height of the wall
 gz_wall_height = 16;
 //How tall the towers stands above the walls
-gz_short_tower_above_wall=10;
+gz_short_tower_above_wall=8;
 gz_tall_tower_above_wall=20;
 //Base of the city
 gz_plaza_top_height = 18;
 
+//------------------------------------------------------------------------------
+//	RIVER CONSTANTS
+//------------------------------------------------------------------------------
 
+//Create flat water at this height. it's where I stop using BLUE
+gz_water_top_height = 6;
+//Top height of the grass sorrounding the river banks
+gz_grass_river_top_height = 16;
+gz_grass_river_height = gz_grass_river_top_height -gz_gridfinity_socket_offset;
+//Randomness of the terrain
+gz_grass_river_roughness = 20;
 

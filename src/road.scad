@@ -56,6 +56,9 @@ module bar_sin_indented
 }
 
 
+//------------------------------------------------------------------------------
+//	ROAD TURN
+//------------------------------------------------------------------------------
 
 module bar_curved(in_r, in_w, in_z)
 {
@@ -94,6 +97,7 @@ module bar_curved_weavy(in_r, in_w, in_z, in_w_amplitude=1/30, in_frequency=2)
 		]
 	);
 }
+
 module bar_curved_weavy_indented
 (
 	in_r,
@@ -125,6 +129,225 @@ module bar_curved_weavy_indented
 			in_frequency=in_frequency
 		);
 	}
+}
+
+//bar_curved_weavy_slanted();
+
+module bar_curved_weavy_slanted
+(
+	in_r=30,
+	in_w=7,
+	in_z=7,
+	//It cuts diagonally both sides to make a ramp
+	ir_slant = 3.5,
+	in_w_amplitude=1/30,
+	in_frequency=2
+)
+{
+
+	difference()
+	{
+		union()
+		{
+			bar_curved_weavy
+			(
+				in_r = in_r,
+				in_w = in_w,
+				in_z = in_z,
+				in_w_amplitude=in_w_amplitude,
+				in_frequency=in_frequency
+			);
+			
+		}		
+		union()
+		{
+			//diagonal cut
+			translate([0,-in_r+ir_slant/2/sqrt(2),in_z+ir_slant/sqrt(2)])
+			rotate([45,0,0])
+			cube([in_w+ir_slant,ir_slant*3,ir_slant*2],center=true);
+			//diagonal cut
+			translate([-in_r+ir_slant/2/sqrt(2),0,in_z+ir_slant/sqrt(2)])
+			rotate([45,0,-90])
+			cube([in_w+ir_slant,ir_slant*3,ir_slant*2],center=true);
+		}
+	}
+
+}
+
+//bar_curved_weavy_indented_slanted();
+
+module bar_curved_weavy_indented_slanted
+(
+	in_r = 30,
+	in_w = 7,
+	in_z = 7,
+	//It cuts diagonally both sides to make a ramp
+	ir_slant = 3.5,
+	in_w_amplitude=1/30,
+	iw_indent = 1.5,
+	iz_indent = 1,
+	in_frequency=2
+)
+{
+	difference()
+	{
+		union()
+		{
+			bar_curved_weavy_indented
+			(
+				in_r,
+				in_w = in_w,
+				in_z = in_z,
+				in_w_amplitude=in_w_amplitude,
+				in_frequency=in_frequency
+			);
+		}
+		union()
+		{
+			//diagonal cut
+			translate([0,-in_r+ir_slant/2/sqrt(2),in_z+ir_slant/sqrt(2)])
+			rotate([45,0,0])
+			cube([in_w+ir_slant,ir_slant*3,ir_slant*2],center=true);
+			//diagonal cut
+			translate([-in_r+ir_slant/2/sqrt(2),0,in_z+ir_slant/sqrt(2)])
+			rotate([45,0,-90])
+			cube([in_w+ir_slant,ir_slant*3,ir_slant*2],center=true);
+		}
+	}
+}
+
+//------------------------------------------------------------------------------
+//	ARCH
+//------------------------------------------------------------------------------
+//	Roads that starts from a point, goes up to an apex, and comes down to that point
+//I make it by extruding an arch sideways
+
+//arch();
+
+module arch
+(
+	il_length = 40,
+	iz_thickness = 5,
+	iw_width=4,
+	iz_height=12,
+	in_segments = 10
+)
+{
+	//Construct the arch polygon
+	lp_arch_points = 
+	[
+		//Top Arch
+		for (n_cnt = [0 : in_segments])
+		[
+			n_cnt * il_length / in_segments,
+			1*iz_thickness +iz_height * sin((n_cnt/in_segments) * 180)
+		],
+		//Bottom Arch
+		for (n_cnt = [0 : in_segments])
+		[
+			(in_segments-n_cnt) * il_length / in_segments,
+			0*iz_thickness +iz_height * sin((n_cnt/in_segments) * 180)
+		]
+
+	];
+
+
+    // Define the polygon vertices
+	translate([-il_length/2,iw_width/2,0])
+	rotate([90,0,0])
+    linear_extrude(height=iw_width)
+    polygon
+	(
+		lp_arch_points
+	);
+}
+
+//arch_indented();
+
+module arch_indented
+(
+	//Length of the arch
+	il_length = 40,
+	//vertical thickness of the arch
+	iz_thickness = 5,
+	//width of the arch
+	iw_width=4,
+	//How tall is the hump
+	iz_height=4,
+	//Create an indent for the guardrails
+	iw_indent = 1.5,
+	iz_indent = 1,
+	//Rounding of the arch
+	in_segments = 10,	
+)
+{
+	difference()
+	{
+		union()
+		{
+			arch
+			(
+				il_length = il_length,
+				iz_thickness = iz_thickness,
+				iw_width=iw_width,
+				iz_height=iz_height,
+				in_segments = in_segments
+			);
+		}
+		union()
+		{
+			translate([0,0,iz_thickness-iz_indent])
+			arch
+			(
+				il_length = il_length,
+				iz_thickness = iz_indent,
+				iw_width=iw_width-iw_indent,
+				iz_height=iz_height,
+				in_segments = in_segments
+			);
+		}
+	}
+
+}
+
+
+// Module to draw a rounded arch bridge
+module arch_bridge(bridge_width = 50, bridge_length = 200, arch_height = 40, arch_thickness = 5) {
+    // Create the rounded arch shape
+    function arch_points(length, height, thickness, segments = 50) =
+        [for (i = [0 : segments])
+            [
+                i * length / segments,
+                height * sin(i * 180 / segments) + thickness
+            ]
+        ];
+
+    // Define the arch shape
+    arch_shape = concat(
+        arch_points(bridge_length, arch_height, arch_thickness),
+        [[bridge_length, 0], [0, 0]] // Closing the bottom of the arch
+    );
+
+    // Define the roadbed shape
+    roadbed_shape = [
+        [0, arch_thickness],
+        [0, arch_thickness + 5],
+        [bridge_length, arch_thickness + 5],
+        [bridge_length, arch_thickness]
+    ];
+
+    // Linear extrude the arch and roadbed
+    difference() {
+        // Extrude the entire bridge structure
+        linear_extrude(height = bridge_width) {
+            polygon(points = arch_shape);
+        }
+        // Subtract the space under the roadbed for clearance
+        translate([0, 0, 0])
+        linear_extrude(height = bridge_width) {
+            polygon(points = roadbed_shape);
+        }
+    }
 }
 
 

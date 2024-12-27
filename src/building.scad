@@ -186,6 +186,13 @@ function calculate_bounds(polygon_points) = [
     max([for (point = polygon_points) point[1]])  // ymax
 ];
 
+
+//------------------------------------------------------------------------------
+//	CITY HOUSES
+//------------------------------------------------------------------------------
+//From a polygon, create a plaza and randomly place houses and towers
+//It's very powerful supporting complex polygons
+
 //I create a slab with houses on it, and cut out to form a polygon
 module city
 (	
@@ -333,6 +340,140 @@ if (false)
 		]
 	);
 }
+
+//------------------------------------------------------------------------------
+//	QUARTER CITY BLOCK
+//------------------------------------------------------------------------------
+//	Draws a quarter of a city including walls
+
+//AUX function to help with the rotation
+//Use gray encoding that ought to conserve rotational simmetry
+function direction(angle) = 
+    (angle % 360 == 0)   ? [1, 1] :
+    (angle % 360 == 90)  ? [-1, 1] :
+    (angle % 360 == 180) ? [-1, -1] :
+    (angle % 360 == 270) ? [1, -1] :
+    [0, 0]; // Default for invalid inputs
+
+
+//quarter_city_block();
+
+module quarter_city_block
+(
+	ir_orientation = 0
+)
+{
+	//TOWER PARAMETERS
+	z_short_tower = gz_wall_height +gz_short_tower_above_wall;
+	z_tall_tower = gz_wall_height +gz_tall_tower_above_wall;
+
+	//COMPUTE POINTS
+
+	n_corner = gw_gridfinity_half_pitch-2.2;
+	n_edge = 10;
+
+	dir = direction(ir_orientation);
+	start_l = [ dir[0]*n_corner, dir[1]*n_corner];
+	end_l = [ dir[0]*n_edge, dir[1]*n_edge];
+	corner_l = (ir_orientation % 180 == 0) ?
+		[ dir[0]*n_corner, dir[1]*gw_gridfinity_half_pitch] :
+		[ dir[0]*gw_gridfinity_half_pitch, dir[1]*n_corner] ;
+
+	echo("Left Points: ", start_l, end_l);
+
+	dir_r = direction(ir_orientation+90);
+	start_r = [ dir_r[0]*n_corner, dir_r[1]*n_corner];
+	end_r = [ dir_r[0]*n_edge, dir_r[1]*n_edge];
+	corner_r = (ir_orientation % 180 == 0) ?
+		[ dir_r[0]*n_corner, dir_r[1]*gw_gridfinity_half_pitch] :
+		[ dir_r[0]*gw_gridfinity_half_pitch, dir_r[1]*n_corner] ;
+
+	echo("Right Points ", start_r, end_r);
+	
+	//I want three wall chunks and two towers
+
+	//LEFT BOTTOM TOWER
+	translate([start_l[0],start_l[1],gz_wall_top_height-gz_wall_height])
+	round_tower
+	(
+		ir_stalk = 2.0,
+		ir_top = 2.0,
+		iz_height = z_short_tower,
+		in_stalk_ratio = 5/7,
+		in_roof_ratio = 1/7
+	);
+
+	//LEFT WALL
+	translate([0,0,gz_wall_top_height-gz_wall_height])
+	wall_with_indent
+	(
+		start_l,
+		end_l,
+		in_w=gw_wall_width,
+		in_z_height=gz_wall_height,
+		in_w_indent = 1.5,
+		in_z_indent=2
+	);
+
+	//LEFT TOP TOWER
+	translate([end_l[0],end_l[1],gz_wall_top_height-gz_wall_height])
+	round_tower(ir_stalk = 2, ir_top = 3, iz_height = z_tall_tower);
+
+	//FRONT WALL
+	translate([0,0,gz_wall_top_height-gz_wall_height])
+	wall_with_indent
+	(
+		end_l,
+		end_r,
+		in_w=gw_wall_width,
+		in_z_height=gz_wall_height,
+		in_w_indent = 1.5,
+		in_z_indent=2
+	);
+
+	//RIGHT TOP TOWER
+	translate([end_r[0],end_r[1],gz_wall_top_height-gz_wall_height])
+	round_tower(ir_stalk = 2, ir_top = 3, iz_height = z_tall_tower);
+
+	translate([0,0,gz_wall_top_height-gz_wall_height])
+	wall_with_indent
+	(
+		start_r,
+		end_r,
+		in_w=gw_wall_width,
+		in_z_height=gz_wall_height,
+		in_w_indent = 1.5,
+		in_z_indent=2
+	);
+
+	//RIGHT BOTTOM TOWER
+	translate([start_r[0],start_r[1],gz_wall_top_height-gz_wall_height])
+	round_tower
+	(
+		ir_stalk = 2.0,
+		ir_top = 2.0,
+		iz_height = z_short_tower,
+		in_stalk_ratio = 5/7,
+		in_roof_ratio = 1/7
+	);
+
+	//CITY PLAZA
+	//Platform where the buildings are spawned
+	translate([0,0,gz_wall_top_height-gz_wall_height])
+	city
+	(
+		[
+			corner_l,
+			end_l,
+			end_r,
+			corner_r
+		],
+		iz_plaza_height = gz_plaza_top_height-gz_wall_top_height+gz_wall_height
+	);
+}
+
+
+
 
 
 //test house
