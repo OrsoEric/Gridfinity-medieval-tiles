@@ -251,7 +251,7 @@ function interpolate_xy(x, y, size, Ztarget) =
 //------------------------------------------------------------------------------
 //	Generates a fractal terrain featuring linear depression that cut across the length of the tile. Suitable to make mountain chain and rivers (?)
 
-if (true)
+if (false)
 {
 	river();
 }
@@ -288,7 +288,7 @@ module river
 			iz_random = iz_random
 		);
 
-	echo("River: ",canyon_plane); 
+	//echo("River: ",canyon_plane); 
 
 	// now make the landscape
 	landscape =
@@ -321,6 +321,7 @@ module river
 				in_height_roll = in_height_roll,
 				box=true
 			);
+			color("blue");
 			linear_extrude(iz_river_level)
 			polygon
 			(

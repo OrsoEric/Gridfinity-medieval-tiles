@@ -17,14 +17,28 @@ include <road.scad>
 //Quarter City
 include <building.scad>
 
+//------------------------------------------------------------------------------
+//	RIVER TILE STRAIGHT + OPTION BRIDGE + OPTION 2X ONE QUARTER CITY
+//------------------------------------------------------------------------------
 
-tile_river();
+if (false)
+{
+	tile_river_straight
+	(
+		ib_bridge = false,
+		ib_one_quarter_city_first = false,
+		ib_one_quarter_city_second = false
+	);
+}
+
+tile_river_straight(true, true, true);
 
 //A grass tile with a road going straight through
-module tile_river
+module tile_river_straight
 (
-	ir_second_block = 0,
-	ib_road = true
+	ib_bridge = false,
+	ib_one_quarter_city_first = false,
+	ib_one_quarter_city_second = false
 )
 {
 	difference()
@@ -34,50 +48,58 @@ module tile_river
 			//Instance a gridfinity base tile
 			grid_block
 			(
-				num_x=1,
-				num_y=1,
-				num_z=0.5,
-				magnet_diameter=0,
-				screw_depth=0
+				num_x				= 1,
+				num_y 				= 1,
+				num_z 				= 0.5,
+				magnet_diameter		= 0,
+				screw_depth			= 0
 			);
 			//Instance fractal terrain
 			translate([0,0,gz_gridfinity_socket_offset])
-			terrain
+			river
 			(
-				in_max_levels = 4,
-				in_width = gw_gridfinity,
-				iz_min_surface_height = gz_grass_base,
-				iz_max_surface_height = gz_grass_flat,
-				//I want grass to have very consistent max height
-				in_height_roll = gn_grass_flat_consistency,
-				in_erosion = 1
+				in_max_levels			= 5,
+				in_width 				= gw_gridfinity,
+				iz_min_surface_height 	= gz_grass_base,
+				iz_max_surface_height 	= gz_grass_river_height,
+				iz_random 				= gz_grass_river_roughness,
+				iz_river_level 			= gz_water_top_height,
+				ir_corner_rounding 		= gr_corner_terrain_rounding,
+				in_erosion				= 1
 			);
-			
-			quarter_city_block();
-
-			if (ir_second_block!=0)
+			//Instance first city quarter
+			if (ib_one_quarter_city_first == true)
 			{
-				quarter_city_block(ir_second_block);
+				quarter_city_block();
 			}
-
+			//Instance second city quarter
+			if (ib_one_quarter_city_second == true)
+			{
+				quarter_city_block(180);
+			}
+			
+			
 			//on top create a half weavy road
-			if (ib_road == true)
+			if (ib_bridge == true)
 			{
 				rotate([0,0,90])
-				translate([gw_gridfinity*(1/8+1/4),0,gz_road_top_height-gz_road_height])
-				bar_sin_indented
+				translate([0,0,gz_road_top_height-gz_bridge_height])
+				arch_indented
 				(
-					in_l = gw_gridfinity/4,
-					in_w = gw_road_width,
-					in_z = gz_road_height,
-					in_w_amplitude = -1,
-					in_frequency = 0
+					//Length of the arch
+					il_length = gw_gridfinity,
+					//vertical thickness of the arch
+					iz_thickness = gz_bridge_height,
+					//width of the arch
+					iw_width=gw_road_width,
+					//How tall is the hump
+					iz_height=gz_bridge_hump
 				);
 			}
 		}
 		union()
 		{
-			if (ib_road == true)
+			if (ib_bridge == true)
 			{
 				pin
 				(

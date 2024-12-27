@@ -186,6 +186,13 @@ function calculate_bounds(polygon_points) = [
     max([for (point = polygon_points) point[1]])  // ymax
 ];
 
+
+//------------------------------------------------------------------------------
+//	CITY HOUSES
+//------------------------------------------------------------------------------
+//From a polygon, create a plaza and randomly place houses and towers
+//It's very powerful supporting complex polygons
+
 //I create a slab with houses on it, and cut out to form a polygon
 module city
 (	
@@ -389,8 +396,8 @@ module quarter_city_block
 	translate([start_l[0],start_l[1],gz_wall_top_height-gz_wall_height])
 	round_tower
 	(
-		ir_stalk = 2,
-		ir_top = 2.5,
+		ir_stalk = 2.0,
+		ir_top = 2.0,
 		iz_height = z_short_tower,
 		in_stalk_ratio = 5/7,
 		in_roof_ratio = 1/7
@@ -443,8 +450,8 @@ module quarter_city_block
 	translate([start_r[0],start_r[1],gz_wall_top_height-gz_wall_height])
 	round_tower
 	(
-		ir_stalk = 2,
-		ir_top = 2.5,
+		ir_stalk = 2.0,
+		ir_top = 2.0,
 		iz_height = z_short_tower,
 		in_stalk_ratio = 5/7,
 		in_roof_ratio = 1/7
