@@ -8,6 +8,8 @@
 
 include <gridfinity_modules.scad>
 
+//Tile Constants
+include <tile_constants.scad>
 
 //Credits to
 //https://www.printables.com/@Anachronist
@@ -28,6 +30,8 @@ gz_terrain_roughness = 3;
 //	CITY 2/4 BLOCK ADJACENT
 //---------------------------------------------------------------------------
 
+//two_quarter_city_block();
+
 module two_quarter_city_block
 (
 	in_z_wall_height = 16,
@@ -39,7 +43,7 @@ module two_quarter_city_block
 	ib_herald = false,
 )
 {
-	n_gridfinity = 41;
+	n_gridfinity = gw_gridfinity;
 
 	//WALL PARAMETERS
 
@@ -200,7 +204,7 @@ module two_quarter_city_block_opposite
 	ib_herald = false,
 )
 {
-	n_gridfinity = 41;
+	n_gridfinity = gw_gridfinity;
 
 	//WALL PARAMETERS
 
@@ -423,7 +427,7 @@ module three_quarter_city_block
 	ib_herald = false,
 )
 {
-	n_gridfinity = 41;
+	n_gridfinity = gw_gridfinity;
 
 	//WALL PARAMETERS
 
@@ -533,9 +537,6 @@ module three_quarter_city_block
 		in_roof_ratio = 1/7
 	);
 
-
-
-
 	//CITY PLAZA
 	//Platform where the buildings are spawned
 	translate([0,0,in_z_wall_top_height-in_z_wall_height])
@@ -596,7 +597,7 @@ module four_quarter_city_block
 	ib_herald = false
 )
 {
-	n_gridfinity = 41;
+	n_gridfinity = gw_gridfinity;
 
 	//WALL PARAMETERS
 
@@ -706,20 +707,21 @@ module four_quarter_city_block
 //	TILE CITY 2/4
 //---------------------------------------------------------------------------
 
+//tile_grass_two_quarter_city();
+
+//tile_grass_two_quarter_city(ib_herald = true);
+
+//tile_grass_two_quarter_city(ib_herald = false, ib_road_turn = true);
+
+//tile_grass_two_quarter_city(ib_herald = true, ib_road_turn = true);
+
 //A grass tile with a road going straight through
 module tile_grass_two_quarter_city
 (
-	ib_herald = false
+	ib_herald = false,
+	ib_road_turn = false
 )
 {
-	//the road reaches up to this height
-	n_z_road_top_height = 14;
-	//the road digs inside the model by this height
-	n_z_road_thickness = 7;
-	n_z_road_indent = 1;
-
-	n_w_road_width = 7;
-	
 	n_z_wall_top_height = 20;
 	n_z_city_top_height = 16;
 	n_z_wall_height = 15;
@@ -737,15 +739,18 @@ module tile_grass_two_quarter_city
 				magnet_diameter=0,
 				screw_depth=0
 			);
-			//On top, create a fractal terrain
-			translate([0,0,gz_terrain_translate_up])
+			//Instance fractal terrain
+			translate([0,0,gz_gridfinity_socket_offset])
 			terrain
 			(
-				in_max_levels = 5,
-				in_width = 41,
-				in_z_delta = gz_terrain_roughness,
-				in_z_offset = gz_terrain_offset,
-				in_erosion=0
+				in_max_levels = 4,
+				in_width = gw_gridfinity,
+				iz_min_surface_height = gz_grass_base,
+				iz_max_surface_height = gz_grass_flat,
+				//I want grass to have very consistent max height
+				in_height_roll = gn_grass_flat_consistency,
+				ir_corner_rounding = gr_corner_terrain_rounding,
+				in_erosion = 1
 			);
 			
 			two_quarter_city_block
@@ -755,92 +760,61 @@ module tile_grass_two_quarter_city
 				iz_plaza_top_height = n_z_city_top_height,
 				ib_herald = ib_herald
 			);
+			
+			if (ib_road_turn == true)
+			{
+				translate([0,0,gz_road_top_height-gz_road_height])
+				rotate([0,0,-90])
+				bar_curved_weavy_indented
+				(
+					in_r=gw_gridfinity_half_pitch,
+					in_z=gz_road_height
+				);
 
-		}
-		union()
-		{
-			//Drill the city block
-			pin(+0.3, -0.8,in_z_top = n_z_wall_top_height+4, in_z_drill = 14);
-			//Drill the grass
-			pin(-0.8, +0.8);
-		}
-	}
-}
-
-//---------------------------------------------------------------------------
-//	TILE CITY 2/4 WITH 90° ROAD
-//---------------------------------------------------------------------------
-
-//A grass tile with a road going straight through
-module tile_grass_two_quarter_city_with_road_turn
-(
-	ib_herald = false
-)
-{
-	//the road reaches up to this height
-	iz_road_top_height = 14;
-	iz_road_height = 9;
-	//the road digs inside the model by this height
-	n_z_road_thickness = 7;
-	n_z_road_indent = 1;
-
-	n_w_road_width = 7;
 	
-	n_z_wall_top_height = 20;
-	n_z_city_top_height = 16;
-	n_z_wall_height = 15;
-
-	difference()
-	{
-		union()
-		{
-			//Create a grifinity tile
-			grid_block
-			(
-				num_x=1,
-				num_y=1,
-				num_z=0.5,
-				magnet_diameter=0,
-				screw_depth=0
-			);
-			//On top, create a fractal terrain
-			translate([0,0,gz_terrain_translate_up])
-			terrain
-			(
-				in_max_levels = 5,
-				in_width = 41,
-				in_z_delta = gz_terrain_roughness,
-				in_z_offset = gz_terrain_offset,
-				in_erosion=0
-			);
-			
-			two_quarter_city_block
-			(
-				in_z_wall_height = n_z_wall_height,
-				in_z_wall_top_height = n_z_wall_top_height,
-				iz_plaza_top_height = n_z_city_top_height,
-				ib_herald = ib_herald
-			);
-
-			translate([0,0,iz_road_top_height-iz_road_height])
-			rotate([0,0,-90])
-			bar_curved_weavy_indented
-			(
-				in_r=20.5,
-				in_z=iz_road_height
-			);
+			}
 
 		}
+		//Difference
 		union()
 		{
-			//Drill the city block
-			pin(+0.3, -0.8,in_z_top = n_z_wall_top_height+4, in_z_drill = 14);
-			//Drill the grass
-			pin(-0.8, +0.8);
-			pin(+0.4, +0.8);
-			//Drill the road
-			pin(-0.8, +0.0);
-		}
+			//NORTH CITY
+			pin
+			(
+				in_x = +0.3 *gw_gridfinity_half_pitch,
+				in_y = -0.8 *gw_gridfinity_half_pitch,
+				in_z_top = gz_wall_top_height+2,
+				in_z_drill = 12
+			);
+			//GRASS NORTH WEST
+			pin
+			(
+				in_x = -0.8 *gw_gridfinity_half_pitch,
+				in_y = +0.8 *gw_gridfinity_half_pitch,
+				in_z_top = gz_grass_top_height,
+				in_z_drill = 8
+			);
+			//There are additional pins if a road cut the field
+			if (ib_road_turn == true)
+			{
+				//GRASS MIDDLE
+				pin
+				(
+					in_x = -0.8 *gw_gridfinity_half_pitch,
+					in_y = -0.4 *gw_gridfinity_half_pitch,
+					in_z_top = gz_grass_top_height,
+					in_z_drill = 8
+				);
+				//ROAD
+				pin
+				(
+					in_x = -0.05 *gw_gridfinity_half_pitch,
+					in_y = +0.8 *gw_gridfinity_half_pitch,
+					in_z_top = gz_road_top_height,
+					in_z_drill = 10
+				);
+			}
+		} //Difference
 	}
 }
 
@@ -849,20 +823,16 @@ module tile_grass_two_quarter_city_with_road_turn
 //---------------------------------------------------------------------------
 
 
+//tile_grass_two_quarter_city_opposite();
+
+//tile_grass_two_quarter_city_opposite(ib_herald = true);
+
 //A grass tile with a road going straight through
 module tile_grass_two_quarter_city_opposite
 (
 	ib_herald = false
 )
 {
-	//the road reaches up to this height
-	n_z_road_top_height = 14;
-	//the road digs inside the model by this height
-	n_z_road_thickness = 7;
-	n_z_road_indent = 1;
-
-	n_w_road_width = 7;
-	
 	n_z_wall_top_height = 20;
 	n_z_city_top_height = 16;
 	n_z_wall_height = 15;
@@ -880,15 +850,18 @@ module tile_grass_two_quarter_city_opposite
 				magnet_diameter=0,
 				screw_depth=0
 			);
-			//On top, create a fractal terrain
-			translate([0,0,gz_terrain_translate_up])
+			//Instance fractal terrain
+			translate([0,0,gz_gridfinity_socket_offset])
 			terrain
 			(
-				in_max_levels = 5,
-				in_width = 41,
-				in_z_delta = gz_terrain_roughness,
-				in_z_offset = gz_terrain_offset,
-				in_erosion=0
+				in_max_levels = 4,
+				in_width = gw_gridfinity,
+				iz_min_surface_height = gz_grass_base,
+				iz_max_surface_height = gz_grass_flat,
+				//I want grass to have very consistent max height
+				in_height_roll = gn_grass_flat_consistency,
+				ir_corner_rounding = gr_corner_terrain_rounding,
+				in_erosion = 1
 			);
 			
 			two_quarter_city_block_opposite
@@ -902,11 +875,32 @@ module tile_grass_two_quarter_city_opposite
 		}
 		union()
 		{
-			//Drill the city block
-			pin(-0.8, +0.0,in_z_top = n_z_wall_top_height+4, in_z_drill = 14);
-			//Drill the grass
-			pin(-0.0, +0.8);
-			pin(-0.0, -0.8);
+			//CITY
+			pin
+			(
+				in_x = +0.8 *gw_gridfinity_half_pitch,
+				in_y = +0.0 *gw_gridfinity_half_pitch,
+				in_z_top = gz_wall_top_height+2,
+				in_z_drill = 12
+			);
+			//GRASS NORTH
+			pin
+			(
+				in_x = -0.0 *gw_gridfinity_half_pitch,
+				in_y = +0.8 *gw_gridfinity_half_pitch,
+				in_z_top = gz_grass_top_height,
+				in_z_drill = 8
+			);
+			//GRASS SOUTH
+			pin
+			(
+				in_x = -0.0 *gw_gridfinity_half_pitch,
+				in_y = -0.8 *gw_gridfinity_half_pitch,
+				in_z_top = gz_grass_top_height,
+				in_z_drill = 8
+			);
+
+			
 		}
 	}
 }
@@ -915,7 +909,7 @@ module tile_grass_two_quarter_city_opposite
 //	TILE CITY 3/4
 //---------------------------------------------------------------------------
 
-//tile_grass_three_quarter_city_road(ib_herald=true,ib_road=true);
+tile_grass_three_quarter_city_road(ib_herald=true,ib_road=true);
 
 //A grass tile with a road going straight through
 module tile_grass_three_quarter_city_road
@@ -943,15 +937,18 @@ module tile_grass_three_quarter_city_road
 				magnet_diameter=0,
 				screw_depth=0
 			);
-			//On top, create a fractal terrain
-			translate([0,0,gz_terrain_translate_up])
+			//Instance fractal terrain
+			translate([0,0,gz_gridfinity_socket_offset])
 			terrain
 			(
-				in_max_levels = 5,
-				in_width = 41,
-				in_z_delta = gz_terrain_roughness,
-				in_z_offset = gz_terrain_offset,
-				in_erosion=0
+				in_max_levels = 4,
+				in_width = gw_gridfinity,
+				iz_min_surface_height = gz_grass_base,
+				iz_max_surface_height = gz_grass_flat,
+				//I want grass to have very consistent max height
+				in_height_roll = gn_grass_flat_consistency,
+				ir_corner_rounding = gr_corner_terrain_rounding,
+				in_erosion = 1
 			);
 			
 			three_quarter_city_block
@@ -979,13 +976,30 @@ module tile_grass_three_quarter_city_road
 		}
 		union()
 		{
-			//Drill the city block
-			pin(+0.0, -0.8,in_z_top = n_z_wall_top_height+4, in_z_drill = 14);
-			//Drill the grass
-			pin(+0.4, +0.8);
-			pin(-0.4, +0.8);
-			//DRILL the road
-			pin(0.0, +0.8);
+			//CITY
+			pin
+			(
+				in_x = +0.0 *gw_gridfinity_half_pitch,
+				in_y = -0.8 *gw_gridfinity_half_pitch,
+				in_z_top = gz_wall_top_height+2,
+				in_z_drill = 12
+			);
+			//GRASS NORTH NORTH EAST
+			pin
+			(
+				in_x = +0.4 *gw_gridfinity_half_pitch,
+				in_y = +0.8 *gw_gridfinity_half_pitch,
+				in_z_top = gz_grass_top_height,
+				in_z_drill = 8
+			);
+			//GRASS NORTH NORTH WEST
+			pin
+			(
+				in_x = -0.4 *gw_gridfinity_half_pitch,
+				in_y = +0.8 *gw_gridfinity_half_pitch,
+				in_z_top = gz_grass_top_height,
+				in_z_drill = 8
+			);
 		}
 	}
 }
@@ -1228,32 +1242,6 @@ module grid_of_tiles_big_city
     }
 }
 
-
-if (false)
-{
-	quarter_city_block
-	(
-		ir_orientation=0
-		//in_z_wall_height = 16,
-		//in_z_wall_top_height = 22,
-		//iz_plaza_top_height = 18
-	);
-}
-
-//tile_grass_quarter_city_one_road();
-
-//tile_grass_quarter_city_two_road_straight();
-
-//tile_grass_quarter_city_two_road_turn_left();
-
-//tile_grass_quarter_city_two_road_turn_right();
-
-//tile_grass_quarter_city_three_roads();
-
-//grid_of_tiles_no_road(4,4);
-
-//grid_of_tiles_road(4,4);
-
 //two_quarter_city_block();
 
 //tile_grass_two_quarter_city(ib_herald=true);
@@ -1264,4 +1252,4 @@ if (false)
 
 //tile_grass_two_quarter_city_opposite(true);
 
-grid_of_tiles_big_city(5,5);
+//grid_of_tiles_big_city(5,5);
