@@ -7,7 +7,19 @@ Meant to use to make D&D modular dungeons like overworld maps and dungeons.
 ## QUICK LINKS
 - ### [PROJECT BOARD](https://github.com/users/OrsoEric/projects/12)
 - ### [ISSUES](https://github.com/OrsoEric/Gridfinity-medieval-tiles/issues)
-- ### [STLs](https://github.com/OrsoEric/Gridfinity-medieval-tiles/tree/Master/stl)
+- ### [STLs](https://github.com/OrsoEric/Gridfinity-medieval-tiles/tree/Master/stl/V2)
+
+Tiles placed on a gridfinity base plate.
+
+![River Tiles Printed](/images/Tiles-Placed.jpg)
+
+River Tiles placed on a Gridfinity base plate for a game with Meeples
+
+![River Tiles Printed](/images/River-Tiles-Placed.jpg)
+
+I printed the river tiles changing filament three times, obtaining blue for water, green for grass, and white for cities and mountains.
+
+![River Tiles Printed](/images/River-Tiles-Printed.jpg)
 
 ## Gridfinity Base Plate
 
