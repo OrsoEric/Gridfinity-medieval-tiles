@@ -909,7 +909,9 @@ module tile_grass_two_quarter_city_opposite
 //	TILE CITY 3/4
 //---------------------------------------------------------------------------
 
-tile_grass_three_quarter_city_road(ib_herald=true,ib_road=true);
+//tile_grass_three_quarter_city_road();
+
+//tile_grass_three_quarter_city_road(ib_herald=true,ib_road=true);
 
 //A grass tile with a road going straight through
 module tile_grass_three_quarter_city_road
@@ -992,14 +994,26 @@ module tile_grass_three_quarter_city_road
 				in_z_top = gz_grass_top_height,
 				in_z_drill = 8
 			);
-			//GRASS NORTH NORTH WEST
-			pin
-			(
-				in_x = -0.4 *gw_gridfinity_half_pitch,
-				in_y = +0.8 *gw_gridfinity_half_pitch,
-				in_z_top = gz_grass_top_height,
-				in_z_drill = 8
-			);
+			//There are additional pins if a road cut the field
+			if (ib_road == true)
+			{
+				//GRASS NORTH NORTH WEST
+				pin
+				(
+					in_x = -0.4 *gw_gridfinity_half_pitch,
+					in_y = +0.8 *gw_gridfinity_half_pitch,
+					in_z_top = gz_grass_top_height,
+					in_z_drill = 8
+				);
+				//ROAD
+				pin
+				(
+					in_x = +0.0 *gw_gridfinity_half_pitch,
+					in_y = +0.8 *gw_gridfinity_half_pitch,
+					in_z_top = gz_road_top_height,
+					in_z_drill = 10
+				);
+			}
 		}
 	}
 }
@@ -1033,15 +1047,18 @@ module tile_grass_four_quarter_city
 				magnet_diameter=0,
 				screw_depth=0
 			);
-			//On top, create a fractal terrain
-			translate([0,0,gz_terrain_translate_up])
+			//Instance fractal terrain
+			translate([0,0,gz_gridfinity_socket_offset])
 			terrain
 			(
-				in_max_levels = 5,
-				in_width = 41,
-				in_z_delta = gz_terrain_roughness,
-				in_z_offset = gz_terrain_offset,
-				in_erosion=0
+				in_max_levels = 4,
+				in_width = gw_gridfinity,
+				iz_min_surface_height = gz_grass_base,
+				iz_max_surface_height = gz_grass_flat,
+				//I want grass to have very consistent max height
+				in_height_roll = gn_grass_flat_consistency,
+				ir_corner_rounding = gr_corner_terrain_rounding,
+				in_erosion = 1
 			);
 			
 			four_quarter_city_block
@@ -1055,8 +1072,14 @@ module tile_grass_four_quarter_city
 		}
 		union()
 		{
-			//Drill the city block
-			pin(-0.8, -0.0,in_z_top = n_z_wall_top_height+4, in_z_drill = 14);
+			//CITY
+			pin
+			(
+				in_x = -0.8 *gw_gridfinity_half_pitch,
+				in_y = +0.0 *gw_gridfinity_half_pitch,
+				in_z_top = gz_wall_top_height+4,
+				in_z_drill = 14
+			);
 		}
 	}
 }
@@ -1103,11 +1126,19 @@ module grid_of_tiles_big_city
 		}
 		else if(n < in_two_quarter_city +in_two_quarter_city_with_herald+in_two_quarter_city_with_road_turn)
 		{
-			tile_grass_two_quarter_city_with_road_turn(ib_herald=false);
+			tile_grass_two_quarter_city
+			(
+				ib_herald=false,
+				ib_road_turn=true
+			);
 		}
 		else if(n < in_two_quarter_city +in_two_quarter_city_with_herald+in_two_quarter_city_with_road_turn+in_two_quarter_city_with_road_turn_with_herald)
 		{
-			tile_grass_two_quarter_city_with_road_turn(ib_herald=true);
+			tile_grass_two_quarter_city
+			(
+				ib_herald=true,
+				ib_road_turn=true
+			);
 		}	
 		else if
 		(
@@ -1242,14 +1273,4 @@ module grid_of_tiles_big_city
     }
 }
 
-//two_quarter_city_block();
-
-//tile_grass_two_quarter_city(ib_herald=true);
-
-//tile_grass_two_quarter_city_with_road_turn();
-
-//two_quarter_city_block_opposite();
-
-//tile_grass_two_quarter_city_opposite(true);
-
-//grid_of_tiles_big_city(5,5);
+grid_of_tiles_big_city(5,5);
