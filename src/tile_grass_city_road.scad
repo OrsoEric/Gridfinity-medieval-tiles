@@ -17,6 +17,9 @@ include <road.scad>
 //Church
 include <building.scad>
 
+//Etch the github url on the back of the tiles
+include <url.scad>
+
 //------------------------------------------------------------------------------
 //	GRASS TILE + CHURCH + STRAIGHT ROAD OPTION
 //------------------------------------------------------------------------------
@@ -24,7 +27,6 @@ include <building.scad>
 //tile_grass_city_quarter(0);
 //tile_grass_city_quarter(90);
 //tile_grass_city_quarter(180);
-//tile_grass_city_quarter(270);
 
 //A grass tile with a road going straight through
 module tile_grass_city_quarter
@@ -81,10 +83,51 @@ module tile_grass_city_quarter
 				);
 			}
 		}
+		//Difference
 		union()
 		{
+			//NORTH CITY
+			pin
+			(
+				in_x = +0.0 *gw_gridfinity_half_pitch,
+				in_y = +0.8 *gw_gridfinity_half_pitch,
+				in_z_top = gz_wall_top_height+2,
+				in_z_drill = 12
+			);
+			//GRASS FIELD
+			pin
+			(
+				in_x = +0.0 *gw_gridfinity_half_pitch,
+				in_y = +0.0 *gw_gridfinity_half_pitch,
+				in_z_top = gz_grass_top_height,
+				in_z_drill = 8
+			);
+			//WEST CITY
+			if (ir_second_block==90)
+			{
+				pin
+				(
+					in_x = -0.8 *gw_gridfinity_half_pitch,
+					in_y = +0.0 *gw_gridfinity_half_pitch,
+					in_z_top = gz_wall_top_height+2,
+					in_z_drill = 12
+				);
+			}
+			//SOUTH CITY
+			if (ir_second_block==180)
+			{
+				pin
+				(
+					in_x = +0.0 *gw_gridfinity_half_pitch,
+					in_y = -0.8 *gw_gridfinity_half_pitch,
+					in_z_top = gz_wall_top_height+2,
+					in_z_drill = 12
+				);
+			}
+			//ROAD PIN
 			if (ib_road == true)
 			{
+				
 				pin
 				(
 					in_x = +0.0 *gw_gridfinity_half_pitch,
@@ -93,108 +136,17 @@ module tile_grass_city_quarter
 					in_z_drill = 10
 				);
 			}
-			pin
-			(
-				in_x = -0.6 *gw_gridfinity_half_pitch,
-				in_y = +0.6 *gw_gridfinity_half_pitch,
-				in_z_top = gz_grass_hill_top_height,
-				in_z_drill = 9
-			);
-			pin
-			(
-				in_x = -0.0 *gw_gridfinity_half_pitch,
-				in_y = +0.3 *gw_gridfinity_half_pitch,
-				in_z_top = 24,
-				in_z_drill = 5
-			);
-		}
+			//Etch the URL to the repo on the back of the tiles
+			translate([-0.7*gw_gridfinity/2,-0.0*gw_gridfinity/2,+0.5])
+			rotate([180,0,0])
+			project_url(in_size = 3,iz_height = 0.5);
+		} //Difference
 	}
 }
 
 //------------------------------------------------------------------------------
-//	OLD
+//	ROAD
 //------------------------------------------------------------------------------
-
-//tile_grass_city_quarter();
-
-//A grass tile with a road going straight through
-module tile_grass_city_quarter_old(ir_second_block = 0)
-{
-	//the road reaches up to this height
-	n_z_road_top_height = 14;
-	//the road digs inside the model by this height
-	n_z_road_thickness = 7;
-	n_z_road_indent = 1;
-
-	n_w_road_width = 7;
-	
-	n_z_wall_top_height = 20;
-	n_z_city_top_height = 16;
-	n_z_wall_height = 15;
-
-	difference()
-	{
-		union()
-		{
-			//Create a grifinity tile
-			grid_block(num_x=1, num_y=1, num_z=0.5, magnet_diameter=0, screw_depth=0);
-			//On top, create a fractal terrain
-			translate([0,0,6])
-			terrain
-			(
-				in_max_levels = 5,
-				in_width = 41,
-				in_z_delta = 6,
-				in_z_offset = 1.5,
-				in_erosion=0
-			);
-			
-			quarter_city_block
-			(
-				ir_orientation=0,
-				in_z_wall_height = n_z_wall_height,
-				in_z_wall_top_height = n_z_wall_top_height,
-				iz_plaza_top_height = n_z_city_top_height
-			);
-
-			if (ir_second_block != 0)
-			{
-				quarter_city_block
-				(
-					ir_orientation=ir_second_block,
-					in_z_wall_height = n_z_wall_height,
-					in_z_wall_top_height=n_z_wall_top_height,
-					iz_plaza_top_height = n_z_city_top_height
-				);
-				
-
-			}
-		}
-		union()
-		{
-			//Drill the city block
-			pin(-0.3, +0.8,in_z_top = n_z_wall_top_height, in_z_drill = 10);
-			//Drill the optional second city quarter
-			if (ir_second_block == 90)
-			{
-				pin(-0.8, -0.3,in_z_top = n_z_wall_top_height, in_z_drill = 10);
-			}
-			else
-			{
-				//Drill the grassland
-				pin(-0.8, 0.4);
-			}
-			if (ir_second_block == 180)
-			{
-				pin(+0.3, -0.8,in_z_top = n_z_wall_top_height, in_z_drill = 10);
-			}
-			if (ir_second_block == 270)
-			{
-				pin(+0.8, -0.3,in_z_top = n_z_wall_top_height, in_z_drill = 10);
-			}
-		}
-	}
-}
 
 module tile_grass_quarter_city_one_road(iz_road_height = 9, iz_road_top_height = 14)
 {
