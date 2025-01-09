@@ -444,6 +444,6 @@ if (false)
 
 //tile_grass_quarter_city_three_roads();
 
-//grid_of_tiles_no_road(4,4);
+grid_of_tiles_no_road(4,4);
 
 //grid_of_tiles_road(4,4);

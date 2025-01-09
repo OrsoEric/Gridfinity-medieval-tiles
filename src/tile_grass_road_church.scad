@@ -17,6 +17,8 @@ include <road.scad>
 //Church
 include <building.scad>
 
+include <url.scad>
+
 //------------------------------------------------------------------------------
 //	GRASS TILE + CHURCH + STRAIGHT ROAD OPTION
 //------------------------------------------------------------------------------
@@ -118,6 +120,10 @@ module tile_grass_road_church
 				in_z_top = 24,
 				in_z_drill = 5
 			);
+			//Etch the URL to the repo on the back of the tiles
+			translate([-0.7*gw_gridfinity/2,-0.0*gw_gridfinity/2,+0.5])
+			rotate([180,0,0])
+			project_url(in_size = 3,iz_height = 0.5);
 		}
 	}
 }

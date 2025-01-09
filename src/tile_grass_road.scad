@@ -16,6 +16,8 @@ include <road.scad>
 //Pin
 include <building.scad>
 
+include <url.scad>
+
 //------------------------------------------------------------------------------
 //	GRASS TILE + STRAIGHT ROAD OPTION FOR TWO, THREE, FOUR WAYS
 //------------------------------------------------------------------------------
@@ -205,6 +207,10 @@ module tile_grass_road_straight
 					in_z_drill = 8
 				);
 			}	
+			//Etch the URL to the repo on the back of the tiles
+			translate([-0.7*gw_gridfinity/2,-0.0*gw_gridfinity/2,+0.5])
+			rotate([180,0,0])
+			project_url(in_size = 3,iz_height = 0.5);
 		}
 	}
 }
