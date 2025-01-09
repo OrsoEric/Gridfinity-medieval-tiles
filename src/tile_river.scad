@@ -234,7 +234,7 @@ module tile_river_straight
 //tile_river_turn(false,false, false);
 
 //road
-tile_river_turn(true,false, false);
+//tile_river_turn(true,false, false);
 
 //First City
 //tile_river_turn(false,true, false);
@@ -333,9 +333,17 @@ module tile_river_turn
 					in_z_drill = 12
 				);
 			}
+			//CURVED ROAD EAST + NORTH
 			if (ib_road_turn == true)
 			{
-
+				//bridge pin
+				pin
+				(
+					in_x = +0.3 *gw_gridfinity_half_pitch,
+					in_y = +0.3 *gw_gridfinity_half_pitch,
+					in_z_top = gz_road_top_height+gz_bridge_height+3,
+					in_z_drill = 10+gz_bridge_height
+				);
 			}
 
 			//SOUTH WEST GRASS PIN			
@@ -399,6 +407,10 @@ module tile_river_turn
 				);
 			
 			}
+			//Etch the URL to the repo on the back of the tiles
+			translate([-0.7*gw_gridfinity/2,-0.0*gw_gridfinity/2,+0.5])
+			rotate([180,0,0])
+			project_url(in_size = 3,iz_height = 0.5);
 		}
 	}
 }
@@ -487,9 +499,37 @@ module tile_river_source_wide
 				);
 			}
 		}
+		//Difference
 		union()
 		{
-		}
+			//NORTH LEFT CITY PIN
+			if (ib_one_quarter_city_first == true)
+			{
+				pin
+				(
+					in_x = +0.0 *gw_gridfinity_half_pitch,
+					in_y = +0.8 *gw_gridfinity_half_pitch,
+					in_z_top = gz_wall_top_height+2,,
+					in_z_drill = 12
+				);
+			}
+			//CURVED ROAD EAST + NORTH
+			if (ib_bridge == true)
+			{
+				//bridge pin
+				pin
+				(
+					in_x = +0.0 *gw_gridfinity_half_pitch,
+					in_y = -0.8 *gw_gridfinity_half_pitch,
+					in_z_top = gz_road_top_height+gz_bridge_height+3,
+					in_z_drill = 10+gz_bridge_height
+				);
+			}
+			//Etch the URL to the repo on the back of the tiles
+			translate([-0.7*gw_gridfinity/2,-0.0*gw_gridfinity/2,+0.5])
+			rotate([180,0,0])
+			project_url(in_size = 3,iz_height = 0.5);
+		} //Difference
 	}
 }
 
@@ -544,9 +584,25 @@ module tile_river_lake
 				quarter_city_block(270);
 			}
 		}
+		//Difference
 		union()
 		{
-		}
+			//EAST CITY PIN
+			if (ib_one_quarter_city_first == true)
+			{
+				pin
+				(
+					in_x = +0.8 *gw_gridfinity_half_pitch,
+					in_y = +0.0 *gw_gridfinity_half_pitch,
+					in_z_top = gz_wall_top_height+2,
+					in_z_drill = 12
+				);
+			}
+			//Etch the URL to the repo on the back of the tiles
+			translate([-0.7*gw_gridfinity/2,-0.0*gw_gridfinity/2,+0.5])
+			rotate([180,0,0])
+			project_url(in_size = 3,iz_height = 0.5);
+		} //Difference
 	}
 }
 
@@ -562,15 +618,15 @@ module grid_of_tiles
 	in_rows = 1,
 	in_cols = 1,
 	//Number of tiles to generate in the grid
-	in_river_straight = 1,
-	in_river_straight_with_bridge = 1,
+	in_river_straight = 3,
+	in_river_straight_with_bridge = 4,
 	in_river_straight_with_single_one_quarter_city = 1,
 	in_river_straight_with_bridge_and_single_one_quarter_city = 1,
 	in_river_straight_with_double_one_quarter_city = 1,
 	in_river_straight_with_bridged_double_one_quarter_city = 1,
 	
-	in_river_turn = 1,
-	in_river_turn_with_road_turn = 1,
+	in_river_turn = 3,
+	in_river_turn_with_road_turn = 4,
 	in_river_turn_left_with_single_one_quarter_city = 1,
 	in_river_turn_right_with_single_one_quarter_city = 1,
 	in_river_turn_with_double_one_quarter_city = 1,
@@ -801,4 +857,4 @@ module grid_of_tiles
 	}
 }
 
-//grid_of_tiles(5,5);
+grid_of_tiles(5,5);
