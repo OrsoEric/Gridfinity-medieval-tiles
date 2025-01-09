@@ -8,6 +8,7 @@ Meant to use to make D&D modular dungeons like overworld maps and dungeons.
 - ### [PROJECT BOARD](https://github.com/users/OrsoEric/projects/12)
 - ### [ISSUES](https://github.com/OrsoEric/Gridfinity-medieval-tiles/issues)
 - ### [STLs](https://github.com/OrsoEric/Gridfinity-medieval-tiles/tree/Master/stl/V2)
+- ### [Thingieverse](https://www.thingiverse.com/thing:6906318)
 
 Tiles placed on a gridfinity base plate.
 
